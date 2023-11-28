@@ -11,6 +11,9 @@ ankh (pip install ankh)
 
 fastapi (pip install fastapi)
 
+<b>Example:</b>
+The predict function gets called in /src/app/rounter/main.py<br>
+4 Examples are given and the output is printed at the end<br>
 
 <b>Function:</b>
 
