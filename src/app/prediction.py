@@ -53,7 +53,7 @@ class multihead_attention_pooling (nn.Module):
         key = self.key(x).reshape(B,L,self.num_heads,E//self.num_heads).permute(0,2,1,3)
         value = self.value(x).reshape(B,L,self.num_heads,E//self.num_heads).permute(0,2,1,3)
         attention = torch.matmul(query, key.transpose(-2,-1))
-        attention = attention / np.sqrt(x.size(2))
+        attention = attention / np.sqrt(E//self.num_heads)
         mask = mask.unsqueeze(1).unsqueeze(1).expand(-1,self.num_heads,1,L)
         attention = attention.masked_fill(mask == 0, -1e9)
         attention = F.softmax(attention, dim=-1)
@@ -141,4 +141,4 @@ def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted):
         prediction_mito = torch.sigmoid(prediction_mito).tolist()
         prediction_sp = predsecreted(emb,mask)
         prediction_sp = torch.sigmoid(prediction_sp).tolist()
-    return prediction_chloro[0], prediction_mito[0], prediction_sp[0]
+    return prediction_chloro[0][0], prediction_mito[0][0], prediction_sp[0][0]

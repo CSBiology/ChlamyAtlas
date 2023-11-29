@@ -14,6 +14,8 @@ fastapi (pip install fastapi)
 <b>Example:</b>
 The predict function gets called in /src/app/rounter/main.py<br>
 4 Examples are given and the output is printed at the end<br>
+The QValue conversion is given in /src/app/value_conversion.fsx<br>
+Two eampples are given at the end on what should happen with the Input type to get the final Output type for one sequence.
 
 <b>Function:</b>
 
@@ -21,11 +23,9 @@ The main function taks as input a fasta file. The sequence is used for the predi
 The sequence is first transformed (probably best to move this to the F# backend further down the line) so it matches the required shape for the tokenizer model.<br>
 The transformed sequence is then given to the ankh tokenizer and model which results in an embedding for each amino acid.<br>
 This embedding is the input for three different models. They predict if the original protein localises to the chloroplast, mitochondira, secretory protein, or if it is does neither of the three.<br>
-Currently the return type is currently unclear (probably something like Protein_ID (faster header), Chloroplast (bool), Chloroplast (qValue), Mitochondria (bool), Mitochondria (qValue), Secretory Protein(bool), Secretory Protein (qValue)).<br>
+The return of the prediction is a triple with the three predictions (chloro_prediction, mito_prediction, secr_prediction).<br>
+The prediction should then be given to an F# script that calculates the corresponding qValues for each Prediction.<br>
+The final type returned by the F# scipt has the fields Header, Chloropred, Qchloro, Mitopred, Qmito, Secrpred, Qsecr. <br>
 
-<b>To DO:</b>
-
-Use the correct model files for the prediction (The current ones are just placeholders, as I need to double check the training data...)<br>
-Implement the qValue calculation (probably in the F#, I will make the backend file for this calculation; probably needs a function call in the backend in the end on the fields of the types that you get from the python files)<br>
-Comments for the code<br>
-  
+<b>TO DO:</b><br>
+- Determine how to deal with multiple sequences (either send them all to the python srcipt as list, or all the python script multiple times)

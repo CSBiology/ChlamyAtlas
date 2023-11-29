@@ -46,29 +46,30 @@ model.eval()
 
 # load models for prediction
 predchloro = Loc_classifier (0.2,2,768, 2,32,64)
-predchloro.load_state_dict(torch.load(src_dic+"/models/chloro_model_epoch_9.pt", map_location=torch.device('cpu')))
+predchloro.load_state_dict(torch.load(src_dic+"/models/chloro_model_epoch_13.pt", map_location=torch.device('cpu')))
 predchloro.eval()
 predmito = Loc_classifier (0.2,2,768, 2,32,64)
-predmito.load_state_dict(torch.load(src_dic+"/models/mito_model_epoch_9.pt", map_location=torch.device('cpu')))
+predmito.load_state_dict(torch.load(src_dic+"/models/mito_model_epoch_6.pt", map_location=torch.device('cpu')))
 predmito.eval()
 predsp = Loc_classifier (0.2,2,768, 2,32,64)
-predsp.load_state_dict(torch.load(src_dic+"/models/sp_model_epoch_9.pt", map_location=torch.device('cpu')))
+predsp.load_state_dict(torch.load(src_dic+"/models/sp_model_epoch_55.pt", map_location=torch.device('cpu')))
 predsp.eval()
 
 # run prediction
-pred_example_1 = prediction(fasta1.sequence, tokenizer, model, predchloro, predmito, predsp)
-pred_example_2 = prediction(fasta2.sequence, tokenizer, model, predchloro, predmito, predsp)
-pred_example_3 = prediction(fasta3.sequence, tokenizer, model, predchloro, predmito, predsp)
-pred_example_4 = prediction(fasta1.sequence, tokenizer, model, predchloro, predmito, predsp)
+cpred1,mpred1,secrpred1 = prediction(fasta1.sequence, tokenizer, model, predchloro, predmito, predsp)
+cpred2,mpred2,secrpred2 = prediction(fasta2.sequence, tokenizer, model, predchloro, predmito, predsp)
+cpred3,mpred3,secrpred3 = prediction(fasta3.sequence, tokenizer, model, predchloro, predmito, predsp)
+cpred4,mpred4,secrpred4 = prediction(fasta4.sequence, tokenizer, model, predchloro, predmito, predsp)
 
 #current return is
-# float list list (shape 3,2 <- outer list with 3 elements, inner list with 2 elements)
-# inner lists has postive score first, negative score second
-# outer list order is chloroplast, mitochondria, secreted
-# example: [[1.,0.],[0.,1.],[0.,1.]] -> chloroplast: positive, mitochondria: negative, secreted: negative
+# float triple
+# triple order is chloroplast, mitochondria, secreted
+# example: (1.,0.,0.) -> chloroplast: positive, mitochondria: negative, secreted: negative
 # however, not clean 1./0. but floats between 1 and 0
-print(pred_example_1)
-print(pred_example_2)
-print(pred_example_3)
-print(pred_example_4)
+print(cpred1,mpred1,secrpred1)
+print(cpred2,mpred2,secrpred2)
+print(cpred3,mpred3,secrpred3)
+print(cpred4,mpred4,secrpred4)
+
+
 
