@@ -1,3 +1,4 @@
+from regex import B
 import torch
 from pathlib import Path
 from torch.utils.data import Dataset, DataLoader
@@ -5,6 +6,15 @@ import numpy as np
 from torch import nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
+
+def collate_fn (batch):
+    pad_value = 0.
+    features = pad_sequence(batch, batch_first=True, padding_value=pad_value)
+    mask = ~(features == pad_value)
+    mask = mask.float()
+    mask = mask.mean(dim=-1)
+    mask = mask > 0.1
+    return features, mask
 
 def generate_embedding (fasta, tokenizer, model):
     protein_seq = [list(fasta)]
@@ -131,7 +141,7 @@ class Loc_classifier (nn.Module):
         return prediction
 
 def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted):
-    emb = generate_embedding (fasta, tokenizer, model)
+    emb = generate_embedding (fasta.Sequence, tokenizer, model)
     B,L,E = emb.size()
     mask = torch.full((1,L), True)
     with torch.no_grad():
@@ -141,4 +151,22 @@ def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted):
         prediction_mito = torch.sigmoid(prediction_mito).tolist()
         prediction_sp = predsecreted(emb,mask)
         prediction_sp = torch.sigmoid(prediction_sp).tolist()
-    return prediction_chloro[0][0], prediction_mito[0][0], prediction_sp[0][0]
+    return fasta.Header, [prediction_chloro[0][0], prediction_mito[0][0], prediction_sp[0][0]]
+
+def prediction2 (fasta, tokenizer, model, predchloro, predmito, predsecreted):
+    emb = [generate_embedding (seq.Sequence, tokenizer, model).view(-1,768) for seq in fasta]
+    name_list = [seq.Header for seq in fasta]
+    emb, mask = collate_fn(emb)
+    with torch.no_grad():
+        prediction_chloro = predchloro(emb,mask)
+        prediction_chloro = torch.sigmoid(prediction_chloro)
+        prediction_chloro = prediction_chloro[:,0]
+        prediction_mito = predmito(emb,mask)
+        prediction_mito = torch.sigmoid(prediction_mito)
+        prediction_mito = prediction_mito[:,0]
+        prediction_sp = predsecreted(emb,mask)
+        prediction_sp = torch.sigmoid(prediction_sp)
+        prediction_sp = prediction_sp[:,0]
+        final_prediction = torch.stack((prediction_chloro, prediction_mito, prediction_sp), dim=1)
+        final_prediction = final_prediction.tolist()
+    return name_list, final_prediction

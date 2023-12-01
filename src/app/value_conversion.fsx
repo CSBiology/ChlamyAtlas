@@ -1,9 +1,21 @@
 #r "nuget: ProteomIQon, 0.0.8"
-#r "nuget: Deedle.Interactive, 3.0.0"
-#r "nuget: FSharp.Stats, 0.5.0"
+#r "nuget: Deedle"
+#r "nuget: FSharp.Stats, 0.4.0"
 open Deedle
-open ProteomIQon
 open FSharp.Stats
+open ProteomIQon
+
+//Workflow of the script:
+// 1. Read in the predictions of each model on the test dataset
+// // Using the functions frameToValues and valuesToDecoys to convert the dataframe into an Array of type BaseDecoys
+// 2. Convert the predictions of the model on the test values to a QValues/predicted score function 
+// // Allows the get a qValue for a new prediction
+// // using the functions getBandwith and calculateQValueLogReg from the FDRControl' module (ProteomIQon)
+// 3. Take the prediction of the model and use the QValue functions to get the QValue for the predictions
+// // using the function addQValues
+// // using the function transformMultiToSingle to convert the multiple predictions to a list of single predictions if needed
+// 4. Alternativly, take the prediction of the model and use the QValue functions to get the QValue for the predictions and the final prediction
+// // using the function addQValuesAndPrediction
 
 //types for the dataframes to QValue function conversion
 type BaseValues = 
@@ -19,12 +31,17 @@ type BaseDecoys =
     }
 
 // Input type (this should come from the python script)
+// Single prediction
 type PredOutput =
     {
         Header     : string
-        Chloropred : float
-        Mitopred   : float
-        Secrpred   : float
+        Prediction : float list
+    }
+// Multiple predictions
+type PredOutputsMultiple =
+    {
+        Header     : string list
+        Prediction : float list list
     }
 
 //Output type (this should be what the user gets as output (probably in table from in the end))
@@ -34,30 +51,30 @@ type CompleteOutput =
         Chloropred : float
         Qchloro    : float
         Mitopred   : float
-        Qmito     : float
+        Qmito      : float
         Secrpred   : float
         Qsecr      : float
     }
 //functions to read the dataframes and covert them to the QValue functions
 let frameToValues dataframe = 
     dataframe
-        |>Deedle.Frame.mapRows (fun k s ->
+        |>Frame.mapRows (fun k s ->
                 {
                     Score = s.GetAs<float>("pred")
                     Label = s.GetAs<float>("target")
                 }
-            )
-        |>Deedle.Series.values
+        )
+        |>Series.values
         |>Array.ofSeq
 
 let valuesToDecoys (values: BaseValues array) =
     values
     |> Array.map (fun v -> 
-            {   
-                Score = v.Score; 
-                Decoy = if v.Label = 0. then true else false
-            }
-        )
+        {   
+            Score = v.Score; 
+            Decoy = if v.Label = 0. then true else false
+        }
+    )
 // function to determine the optimal bandwith for the QValue function
 let getBandwith frameOfIntereset = 
     frameOfIntereset
@@ -65,17 +82,24 @@ let getBandwith frameOfIntereset =
     |>Array.map (fun x -> x.Score)
     |>Distributions.Bandwidth.nrd0
 
+//function to convert the multiple predictions to a list of single predictions
+let transformMultiToSingle (prediction: PredOutputsMultiple) :list<PredOutput>=
+    prediction
+    |>fun x -> List.zip x.Header x.Prediction
+    |>List.map (fun (x: string * float list) ->
+        {Header = fst x; Prediction = snd x}
+    )
 
 //function to add the QValues to the Input type to create the Output type
 let addQValues (prediction: PredOutput) (funcChloroQ: float->float) (funcMitoQ2: float->float) (funcSecrQ: float->float) =
     {
         Header = prediction.Header
-        Chloropred = prediction.Chloropred
-        Mitopred = prediction.Mitopred
-        Secrpred = prediction.Secrpred
-        Qchloro = funcChloroQ prediction.Chloropred
-        Qmito = funcMitoQ2 prediction.Mitopred
-        Qsecr = funcSecrQ prediction.Secrpred
+        Chloropred = prediction.Prediction.[0]
+        Mitopred = prediction.Prediction.[1]
+        Secrpred = prediction.Prediction.[2]
+        Qchloro = funcChloroQ prediction.Prediction.[0]
+        Qmito = funcMitoQ2 prediction.Prediction.[1]
+        Qsecr = funcSecrQ prediction.Prediction.[2]
     }
 
 //read the dataframes
@@ -99,28 +123,63 @@ let decoyArraySecr =
     |>frameToValues
     |>valuesToDecoys
 
-let chloroQ = ProteomIQon.FDRControl'.calculateQValueLogReg 1.0(getBandwith frameChloro)(decoyArrayChloro) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
-let mitoQ = ProteomIQon.FDRControl'.calculateQValueLogReg 1.0(getBandwith frameMito)(decoyArrayMito) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
-let secrQ = ProteomIQon.FDRControl'.calculateQValueLogReg 1.0(getBandwith frameSecr)(decoyArraySecr) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
+let chloroQ = FDRControl'.calculateQValueLogReg 1.0(getBandwith frameChloro)(decoyArrayChloro) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
+let mitoQ = FDRControl'.calculateQValueLogReg 1.0(getBandwith frameMito)(decoyArrayMito) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
+let secrQ = FDRControl'.calculateQValueLogReg 1.0(getBandwith frameSecr)(decoyArraySecr) (fun (x:BaseDecoys)-> x.Decoy) (fun x->x.Score) (fun x -> x.Score)
 
 //example inputs:
-let example1 = 
+let example1: PredOutput = 
     {
         Header = "Cre03.g207377"
-        Chloropred = 0.8505728244781494
-        Mitopred = 0.20688468217849731
-        Secrpred = 0.14377914369106293
+        Prediction = [0.8505728244781494;0.20688468217849731;0.14377914369106293]
     }
 
-let example2 =
+let example2: PredOutput =
     {
         Header = "Cre05.g242950"
-        Chloropred = 0.1338839828968048
-        Mitopred = 0.6741871237754822
-        Secrpred = 0.13130035996437073
+        Prediction = [0.1338839828968048;0.6741871237754822;0.13130035996437073]
     }
 
 //run the example inputs through the addQValues function
 let example1output = addQValues example1 chloroQ mitoQ secrQ
 let example2output = addQValues example2 chloroQ mitoQ secrQ
 
+//Output type2 (in case we want to do the cutoff computation for the user
+// would require that the cutoff is stored in another type (the original input type probably))
+// // new output type
+// type CompleteOutput2 =
+//     {
+//         Header     : string
+//         Chloropred : float
+//         Qchloro    : float
+//         Mitopred   : float
+//         Qmito      : float
+//         Secrpred   : float
+//         Qsecr      : float
+//         finalPred  : string
+//     }
+// //function to add the QValues to the Input type to create the Output type
+// let addQValuesAndPrediction (prediction: PredOutput) (funcChloroQ: float->float) (funcMitoQ2: float->float) (funcSecrQ: float->float) (cutoff)=
+//     let qChloro = funcChloroQ prediction.Prediction.[0]
+//     let qMito = funcMitoQ2 prediction.Prediction.[1]
+//     let qSecr = funcSecrQ prediction.Prediction.[2]
+//     let finalOutput = 
+//         if   qChloro < cutoff && qMito > cutoff   && qSecr > cutoff then "Chloroplast"
+//         elif qMito < cutoff   && qChloro > cutoff && qSecr > cutoff then "Mitochondria"
+//         elif qSecr < cutoff   && qMito > cutoff   && qChloro > cutoff then "Secretory"
+//         elif qChloro < cutoff && qMito < cutoff   && qSecr > cutoff then "Chloroplast, Mitochondria"
+//         elif qChloro < cutoff && qSecr < cutoff   && qMito > cutoff then "Chloroplast, Secretory"
+//         elif qMito < cutoff   && qSecr < cutoff   && qChloro > cutoff then "Mitochondria, Secretory"
+//         elif qChloro < cutoff && qMito < cutoff   && qSecr < cutoff then "Chloroplast, Mitochondria, Secretory"
+//         else "Cytoplasmic"
+//     {
+//         Header = prediction.Header
+//         Chloropred = prediction.Prediction.[0]
+//         Mitopred = prediction.Prediction.[1]
+//         Secrpred = prediction.Prediction.[2]
+//         Qchloro = qChloro
+//         Qmito = qMito
+//         Qsecr = qSecr
+//         FinalPred = finalOutput
+//     }
+    
