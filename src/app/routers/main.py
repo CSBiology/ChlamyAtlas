@@ -9,7 +9,7 @@ from pathlib import Path
 current_dir = Path(__file__).parent
 parent_dir = current_dir.parent
 sys.path.append(str(parent_dir))
-from prediction import Loc_classifier, prediction, prediction2
+from prediction import Loc_classifier, prediction
 
 # Input data class
 # this is what would need to be send if we go for one sequence at a time
@@ -58,13 +58,13 @@ predsp = Loc_classifier (0.2,2,768, 2,32,64)
 predsp.load_state_dict(torch.load(src_dic+"/models/sp_model_epoch_55.pt", map_location=torch.device('cpu')))
 predsp.eval()
 
-# run prediction single sequence
-name1,pred1 = prediction(fasta1, tokenizer, model, predchloro, predmito, predsp)
-name2,pred2 = prediction(fasta2, tokenizer, model, predchloro, predmito, predsp)
-name3,pred3 = prediction(fasta3, tokenizer, model, predchloro, predmito, predsp)
-name4,pred4 = prediction(fasta4, tokenizer, model, predchloro, predmito, predsp)
+# # run prediction single sequence
+out1 = prediction([fasta1], tokenizer, model, predchloro, predmito, predsp)
+out2 = prediction([fasta2], tokenizer, model, predchloro, predmito, predsp)
+out3 = prediction([fasta3], tokenizer, model, predchloro, predmito, predsp)
+out4 = prediction([fasta4], tokenizer, model, predchloro, predmito, predsp)
 # run prediction multiple sequences (can also be used for single sequence)
-names5,pred5 = prediction2(pred.Fasta, tokenizer, model, predchloro, predmito, predsp)
+out5 = prediction(pred.Fasta, tokenizer, model, predchloro, predmito, predsp)
 
 
 #current return is either
@@ -80,11 +80,11 @@ names5,pred5 = prediction2(pred.Fasta, tokenizer, model, predchloro, predmito, p
 # example: [1.,0.,0.] -> chloroplast: positive, mitochondria: negative, secreted: negative
 # however, not clean 1./0. but floats between 1 and 0
 
-print(name1,pred1)
-print(name2,pred2)
-print(name3,pred3)
-print(name4,pred4)
-print (names5,pred5)
+print (out1)
+print (out2)
+print (out3)
+print (out4)
+print (out5)
 
 
 

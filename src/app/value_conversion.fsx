@@ -37,14 +37,10 @@ type PredOutput =
         Header     : string
         Prediction : float list
     }
-// Multiple predictions
-type PredOutputsMultiple =
-    {
-        Header     : string list
-        Prediction : float list list
-    }
 
-//Output type (this should be what the user gets as output (probably in table from in the end))
+//Output type (in case we want to do the cutoff computation for the user
+// would require that the cutoff is stored in another type (the original input type probably))
+// // new output type
 type CompleteOutput =
     {
         Header     : string
@@ -54,6 +50,7 @@ type CompleteOutput =
         Qmito      : float
         Secrpred   : float
         Qsecr      : float
+        FinalPred  : string
     }
 //functions to read the dataframes and covert them to the QValue functions
 let frameToValues dataframe = 
@@ -82,24 +79,29 @@ let getBandwith frameOfIntereset =
     |>Array.map (fun x -> x.Score)
     |>Distributions.Bandwidth.nrd0
 
-//function to convert the multiple predictions to a list of single predictions
-let transformMultiToSingle (prediction: PredOutputsMultiple) :list<PredOutput>=
-    prediction
-    |>fun x -> List.zip x.Header x.Prediction
-    |>List.map (fun (x: string * float list) ->
-        {Header = fst x; Prediction = snd x}
-    )
-
 //function to add the QValues to the Input type to create the Output type
-let addQValues (prediction: PredOutput) (funcChloroQ: float->float) (funcMitoQ2: float->float) (funcSecrQ: float->float) =
+let addQValuesAndPrediction (prediction: PredOutput) (funcChloroQ: float->float) (funcMitoQ2: float->float) (funcSecrQ: float->float) (cutoff)=
+    let qChloro = funcChloroQ prediction.Prediction.[0]
+    let qMito = funcMitoQ2 prediction.Prediction.[1]
+    let qSecr = funcSecrQ prediction.Prediction.[2]
+    let finalOutput = 
+        if   qChloro < cutoff && qMito > cutoff   && qSecr > cutoff then "Chloroplast"
+        elif qMito < cutoff   && qChloro > cutoff && qSecr > cutoff then "Mitochondria"
+        elif qSecr < cutoff   && qMito > cutoff   && qChloro > cutoff then "Secretory"
+        elif qChloro < cutoff && qMito < cutoff   && qSecr > cutoff then "Chloroplast, Mitochondria"
+        elif qChloro < cutoff && qSecr < cutoff   && qMito > cutoff then "Chloroplast, Secretory"
+        elif qMito < cutoff   && qSecr < cutoff   && qChloro > cutoff then "Mitochondria, Secretory"
+        elif qChloro < cutoff && qMito < cutoff   && qSecr < cutoff then "Chloroplast, Mitochondria, Secretory"
+        else "Cytoplasmic"
     {
         Header = prediction.Header
         Chloropred = prediction.Prediction.[0]
         Mitopred = prediction.Prediction.[1]
         Secrpred = prediction.Prediction.[2]
-        Qchloro = funcChloroQ prediction.Prediction.[0]
-        Qmito = funcMitoQ2 prediction.Prediction.[1]
-        Qsecr = funcSecrQ prediction.Prediction.[2]
+        Qchloro = qChloro
+        Qmito = qMito
+        Qsecr = qSecr
+        FinalPred = finalOutput
     }
 
 //read the dataframes
@@ -140,46 +142,26 @@ let example2: PredOutput =
         Prediction = [0.1338839828968048;0.6741871237754822;0.13130035996437073]
     }
 
-//run the example inputs through the addQValues function
-let example1output = addQValues example1 chloroQ mitoQ secrQ
-let example2output = addQValues example2 chloroQ mitoQ secrQ
+let example3: PredOutput =
+    {
+        Header = "Cre05.g242950"
+        Prediction = [0.2514885365962982; 0.09152786433696747; 0.2829943597316742]
+    }
 
-//Output type2 (in case we want to do the cutoff computation for the user
-// would require that the cutoff is stored in another type (the original input type probably))
-// // new output type
-// type CompleteOutput2 =
-//     {
-//         Header     : string
-//         Chloropred : float
-//         Qchloro    : float
-//         Mitopred   : float
-//         Qmito      : float
-//         Secrpred   : float
-//         Qsecr      : float
-//         finalPred  : string
-//     }
-// //function to add the QValues to the Input type to create the Output type
-// let addQValuesAndPrediction (prediction: PredOutput) (funcChloroQ: float->float) (funcMitoQ2: float->float) (funcSecrQ: float->float) (cutoff)=
-//     let qChloro = funcChloroQ prediction.Prediction.[0]
-//     let qMito = funcMitoQ2 prediction.Prediction.[1]
-//     let qSecr = funcSecrQ prediction.Prediction.[2]
-//     let finalOutput = 
-//         if   qChloro < cutoff && qMito > cutoff   && qSecr > cutoff then "Chloroplast"
-//         elif qMito < cutoff   && qChloro > cutoff && qSecr > cutoff then "Mitochondria"
-//         elif qSecr < cutoff   && qMito > cutoff   && qChloro > cutoff then "Secretory"
-//         elif qChloro < cutoff && qMito < cutoff   && qSecr > cutoff then "Chloroplast, Mitochondria"
-//         elif qChloro < cutoff && qSecr < cutoff   && qMito > cutoff then "Chloroplast, Secretory"
-//         elif qMito < cutoff   && qSecr < cutoff   && qChloro > cutoff then "Mitochondria, Secretory"
-//         elif qChloro < cutoff && qMito < cutoff   && qSecr < cutoff then "Chloroplast, Mitochondria, Secretory"
-//         else "Cytoplasmic"
-//     {
-//         Header = prediction.Header
-//         Chloropred = prediction.Prediction.[0]
-//         Mitopred = prediction.Prediction.[1]
-//         Secrpred = prediction.Prediction.[2]
-//         Qchloro = qChloro
-//         Qmito = qMito
-//         Qsecr = qSecr
-//         FinalPred = finalOutput
-//     }
+//example cutoff
+let cutoff = 0.05
+
+//calculation of the outputs from the examples
+let example1output_ = addQValuesAndPrediction example1 chloroQ mitoQ secrQ cutoff
+let examp2e1output_ = addQValuesAndPrediction example2 chloroQ mitoQ secrQ cutoff
+let example4output_ = addQValuesAndPrediction example3 chloroQ mitoQ secrQ cutoff
+
+//run multiple examples
+let arrayOfInputs = [|example1;example2;example3|]
+
+let arrayOfOutputs = 
+    arrayOfInputs
+    |> Array.map (fun x ->
+        addQValuesAndPrediction x chloroQ mitoQ secrQ cutoff
+    )
     
