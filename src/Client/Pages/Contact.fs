@@ -10,5 +10,20 @@ open Feliz.Router
 type Contact =
     static member Main() =
         Components.MainCard.Main [
-            Html.div "Contact Page"
+            Html.div [
+                prop.className "prose"
+                prop.children [
+                    Html.h1 "Contact"
+
+                    Html.p "This service is developed and maintained by the Computational Systems Biology, RPTU University of Kaiserslautern, 67663 Kaiserslautern, Germany."
+
+                    Html.p [
+                        Html.text "Contact us via "
+                        Html.a [prop.href Shared.Urls.ContactEmailObfuscated; prop.text "email"]
+                        Html.text " or visit the open source "
+                        Html.a [prop.href Shared.Urls.GitHubRepo; prop.text "GitHub repository"]
+                        Html.text " of this service!"
+                    ]
+                ]
+            ]
         ]
