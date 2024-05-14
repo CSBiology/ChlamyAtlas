@@ -22,6 +22,9 @@
         <Compile Include="Components\Vanta.fs" />
         <Compile Include="Components\HeadBanner.fs" />
         <Compile Include="Components\Navbar.fs" />
+        <Compile Include="Pages\Contact.fs" />
+        <Compile Include="Pages\PrivacyPolicy.fs" />
+        <Compile Include="Pages\About.fs" />
         <Compile Include="Pages\Predictor\Types.fs" />
         <Compile Include="Pages\Predictor\DataInput.fs" />
         <Compile Include="Pages\Predictor\Settings.fs" />

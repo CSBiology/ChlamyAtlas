@@ -116,9 +116,9 @@ type View =
                                 match page with
                                 | Main -> Pages.Main.Main()
                                 | DataAccess -> Pages.DataAccess.Main()
-                                | About -> Html.div "About"
-                                | Contact -> Html.div "Contact"
-                                | PrivacyPolicy -> Html.div "Privacy Policy"
+                                | About -> Pages.About.Main()
+                                | Contact -> Pages.Contact.Main()
+                                | PrivacyPolicy -> Pages.PrivacyPolicy.Main()
                                 | NotFound -> Html.h1 "404 - Not Found"
                             ]
                         ]
