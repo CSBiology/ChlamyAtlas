@@ -74,6 +74,9 @@ type Navbar =
                     ]
                     Daisy.button.a [
                         button.ghost
+                        button.animation
+                        button.link
+                        prop.className "cursor-default"
                         prop.children [
                             Html.img [prop.src csb_logo]
                         ]
@@ -94,8 +97,12 @@ type Navbar =
                 ]
 
                 Daisy.navbarEnd [
-                    Daisy.button.button [
-                        Html.i [prop.classes [fa.faBrands; fa.faGithub; fa.faXl]]
+                    Daisy.button.a [
+                        prop.href Shared.Urls.GitHubRepo
+                        prop.target.blank
+                        prop.children [
+                            Html.i [prop.classes [fa.faBrands; fa.faGithub; fa.faXl]]
+                        ]
                     ]
                 ]
             ]

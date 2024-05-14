@@ -11,17 +11,21 @@ type PrivacyPolicy =
     static member Main() =
         let effectiveDate = "2024-05-14"
         let websiteUrl = Shared.Urls.WebsiteUrl
-        let contactEmail = Shared.Urls.ContactEmailObfuscated
+        let contactEmail = Components.EmailLaunchAnchor.Main("email", Shared.Urls.ContactEmailObfuscated)
         Components.MainCard.Main [
             Html.article [
                 prop.className "prose"
                 prop.children [
                     Html.h1 "Privacy Policy"
-                    Html.p $"Effective Date: {effectiveDate}"
+                    Html.p [
+                        Html.text $"Effective Date: "
+                        Html.strong effectiveDate
+                    ]
                     Html.p $"Thank you for using our machine learning web service. Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website located at {websiteUrl} and our machine learning service."
                     Html.p [
                         Html.text $"If you have any questions or concerns about our privacy practices, please contact us via "
-                        Html.a [prop.href contactEmail; prop.text "email"]
+                        contactEmail
+                        Html.text "."
                     ]
 
                     Html.h2 "Information We Collect"
@@ -65,8 +69,9 @@ type PrivacyPolicy =
                     Html.h2 "Contact Us"
 
                     Html.p [
-                        Html.text "If you have any questions or concerns about our Privacy Policy, please contact us via ."
-                        Html.a [prop.href contactEmail; prop.text "email"]
+                        Html.text "If you have any questions or concerns about our Privacy Policy, please contact us via "
+                        contactEmail
+                        Html.text "."
                     ]
                 ]
             ]

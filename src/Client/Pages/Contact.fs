@@ -19,7 +19,7 @@ type Contact =
 
                     Html.p [
                         Html.text "Contact us via "
-                        Html.a [prop.href Shared.Urls.ContactEmailObfuscated; prop.text "email"]
+                        Components.EmailLaunchAnchor.Main("email", Shared.Urls.ContactEmailObfuscated)
                         Html.text " or visit the open source "
                         Html.a [prop.href Shared.Urls.GitHubRepo; prop.text "GitHub repository"]
                         Html.text " of this service!"
