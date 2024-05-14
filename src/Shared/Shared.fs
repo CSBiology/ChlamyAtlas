@@ -14,6 +14,17 @@ module Urls =
     [<Literal>]
     let GitHubRepo = "https://github.com/CSBiology/ChlamyAtlas"
 
+    [<Literal>]
+    let REFPaperAtlas = @"https://www.sciencedirect.com/science/article/pii/S0092867423006761?via%3Dihub"
+
+    module ProteomIQon =
+        
+        [<Literal>]
+        let Zenodo = @"https://zenodo.org/records/6482417"
+
+        [<Literal>]
+        let GitHub = @"https://github.com/CSBiology/ProteomIQon"
+
 module EndPoints =
     [<Literal>]
     let endpoint = "/bridge"

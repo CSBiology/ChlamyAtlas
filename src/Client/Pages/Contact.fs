@@ -10,7 +10,7 @@ open Feliz.Router
 type Contact =
     static member Main() =
         Components.MainCard.Main [
-            Html.div [
+            Html.article [
                 prop.className "prose"
                 prop.children [
                     Html.h1 "Contact"

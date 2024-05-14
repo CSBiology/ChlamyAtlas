@@ -13,7 +13,7 @@ type PrivacyPolicy =
         let websiteUrl = Shared.Urls.WebsiteUrl
         let contactEmail = Shared.Urls.ContactEmailObfuscated
         Components.MainCard.Main [
-            Html.div [
+            Html.article [
                 prop.className "prose"
                 prop.children [
                     Html.h1 "Privacy Policy"
