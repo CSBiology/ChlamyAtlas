@@ -358,12 +358,16 @@ q-values exceed the cutoff, the protein is classified as "Cytoplasmic." """
                                             for field in [|
                                                 ele.Header
                                                 ele.FinalPred |> Array.map string |> String.concat ";"
-                                                !!ele.Chloropred
-                                                !!ele.Qchloro
-                                                !!ele.Mitopred
-                                                !!ele.Qmito
-                                                !!ele.Secrpred
-                                                !!ele.Qsecr
+                                            |] do
+                                                Html.td [Html.strong field]
+
+                                            for field in [|
+                                                string ele.Chloropred
+                                                string ele.Qchloro
+                                                string ele.Mitopred
+                                                string ele.Qmito
+                                                string ele.Secrpred
+                                                string ele.Qsecr
                                             |] do
                                                 Html.td field
                                         ]
