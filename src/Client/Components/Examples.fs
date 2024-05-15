@@ -102,7 +102,7 @@ type Examples =
                         Daisy.divider [
                         ]
                         Html.li [Html.a [
-                            //prop.href Shared.Urls.GitHubFormatInfo //TODO
+                            prop.href Shared.Urls.SupportedFastaFormat
                             prop.target "_blank"
                             prop.children [
                                 Daisy.labelTextAlt [

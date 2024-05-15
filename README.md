@@ -4,7 +4,7 @@ A web UI for optimised versions of the models published in Wang et al. 2023.
 
 # Supported formats
 
-deepSTAPp expects input in either the FASTA format or as pure amino acid sequence. 
+ChlamyAtlas expects input in either the FASTA format or as pure amino acid sequence. 
 The FASTA format consists of two building blocks. The first is a description which explains the following sequence. This description starts with ">" and is written in a single line. The amino acid sequence follows in the next line and can span multiple lines. An example for this format is:
 ```
 >sp|A0A178WF56|CSTM3_ARATH Protein CYSTEINE-RICH TRANSMEMBRANE MODULE 3 OS=Arabidopsis thaliana OX=3702 GN=CYSTM3 PE=1 SV=1
@@ -20,7 +20,8 @@ TMEKMMMKMKGRSQLVKVVEEDAHDHGEIIKNNNRSQVNRSSFEMTHCEDKIEELCKNDR
 FAVCNEFIMNKKDHISNESYDLVNYKPNSSFPVINHHRSQGAANSIEQHQFTDLHYSFGA
 KPRDLMHNYQNMY
 ```
-deepSTABp was developed with the assumption that the description follows the standard used by the Universal Protein Resource ([Uniprot](https://www.uniprot.org/)) and only returns the Uniprot ID as description in the output table. This can be circumvented by removing the "|" in the description. In this case the complete description gets returned.
+
+ChlamyAtlas was developed with the assumption that the description follows the standard used by the Universal Protein Resource ([Uniprot](https://www.uniprot.org/)) and only returns the Uniprot ID as description in the output table. This can be circumvented by removing the "|" in the description. In this case the complete description gets returned.
 
 The only other supported format are pure amino acid sequences. An example for this format is:
 ```

@@ -150,12 +150,14 @@ type Runner =
         Html.div [
             prop.className "flex flex-col gap-3"
             prop.children [
+                Html.p "The prediction has started. With your Id you can access the current state of the requested prediction via the `Data Access` tab in the navbar."
                 Daisy.alert [
                     alert.warning
                     prop.children [
                         Html.i [prop.className [fa.faSolid; fa.faInfoCircle; fa.fa2Xl]]
-                        Html.p [
-                            prop.text "Remember to copy the id below. Without it you will not be able to access your analyzed data!"
+                        Html.div [
+                            Html.p "Remember to copy the id below. Without it you will not be able to access your analyzed data!"
+                            Html.p "After you leave this screen this code can not be recovered!"
                         ]
                     ]
                 ]

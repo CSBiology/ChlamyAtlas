@@ -15,6 +15,9 @@ module Urls =
     let GitHubRepo = "https://github.com/CSBiology/ChlamyAtlas"
 
     [<Literal>]
+    let SupportedFastaFormat = @"https://github.com/CSBiology/ChlamyAtlas?tab=readme-ov-file#supported-formats"
+
+    [<Literal>]
     let REFPaperAtlas = @"https://www.sciencedirect.com/science/article/pii/S0092867423006761?via%3Dihub"
 
     [<Literal>]
