@@ -2,6 +2,45 @@
 
 A web UI for optimised versions of the models published in Wang et al. 2023.
 
+# Supported formats
+
+deepSTAPp expects input in either the FASTA format or as pure amino acid sequence. 
+The FASTA format consists of two building blocks. The first is a description which explains the following sequence. This description starts with ">" and is written in a single line. The amino acid sequence follows in the next line and can span multiple lines. An example for this format is:
+```
+>sp|A0A178WF56|CSTM3_ARATH Protein CYSTEINE-RICH TRANSMEMBRANE MODULE 3 OS=Arabidopsis thaliana OX=3702 GN=CYSTM3 PE=1 SV=1
+MAQYHQQHEMKQTMAETQYVTAPPPMGYPVMMKDSPQTVQPPHEGQSKGSGGFLRGCLAA
+MCCCCVLDCVF
+>sp|A1YKT1|TCP18_ARATH Transcription factor TCP18 OS=Arabidopsis thaliana OX=3702 GN=TCP18 PE=1 SV=1
+MNNNIFSTTTTINDDYMLFPYNDHYSSQPLLPFSPSSSINDILIHSTSNTSNNHLDHHHQ
+FQQPSPFSHFEFAPDCALLTSFHPENNGHDDNQTIPNDNHHPSLHFPLNNTIVEQPTEPS
+ETINLIEDSQRISTSQDPKMKKAKKPSRTDRHSKIKTAKGTRDRRMRLSLDVAKELFGLQ
+DMLGFDKASKTVEWLLTQAKPEIIKIATTLSHHGCFSSGDESHIRPVLGSMDTSSDLCEL
+ASMWTVDDRGSNTNTTETRGNKVDGRSMRGKRKRPEPRTPILKKLSKEERAKARERAKGR
+TMEKMMMKMKGRSQLVKVVEEDAHDHGEIIKNNNRSQVNRSSFEMTHCEDKIEELCKNDR
+FAVCNEFIMNKKDHISNESYDLVNYKPNSSFPVINHHRSQGAANSIEQHQFTDLHYSFGA
+KPRDLMHNYQNMY
+```
+deepSTABp was developed with the assumption that the description follows the standard used by the Universal Protein Resource ([Uniprot](https://www.uniprot.org/)) and only returns the Uniprot ID as description in the output table. This can be circumvented by removing the "|" in the description. In this case the complete description gets returned.
+
+The only other supported format are pure amino acid sequences. An example for this format is:
+```
+MAQYHQQHEMKQTMAETQYVTAPPPMGYPVMMKDSPQTVQPPHEGQSKGSGGFLRGCLAA
+MCCCCVLDCVF
+```
+This format can only be used for a single amino acid sequence. Multiple amino acid sequences must be in the following format:
+```
+>!MAQYHQQHEMKQTMAETQYVTAPPPMGYPVMMKDSPQTVQPPHEGQSKGSGGFLRGCLAA
+MCCCCVLDCVF
+>!MNNNIFSTTTTINDDYMLFPYNDHYSSQPLLPFSPSSSINDILIHSTSNTSNNHLDHHHQ
+FQQPSPFSHFEFAPDCALLTSFHPENNGHDDNQTIPNDNHHPSLHFPLNNTIVEQPTEPS
+ETINLIEDSQRISTSQDPKMKKAKKPSRTDRHSKIKTAKGTRDRRMRLSLDVAKELFGLQ
+DMLGFDKASKTVEWLLTQAKPEIIKIATTLSHHGCFSSGDESHIRPVLGSMDTSSDLCEL
+ASMWTVDDRGSNTNTTETRGNKVDGRSMRGKRKRPEPRTPILKKLSKEERAKARERAKGR
+TMEKMMMKMKGRSQLVKVVEEDAHDHGEIIKNNNRSQVNRSSFEMTHCEDKIEELCKNDR
+FAVCNEFIMNKKDHISNESYDLVNYKPNSSFPVINHHRSQGAANSIEQHQFTDLHYSFGA
+KPRDLMHNYQNMY
+```
+
 # Local Development
 
 ## Install pre-requisites
