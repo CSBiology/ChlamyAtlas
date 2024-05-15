@@ -17,6 +17,11 @@ type private ValidationStatus =
     | Invalid of exn
     | Valid
 
+    member this.Error =
+        match this with
+        | Invalid exn -> Some exn
+        | _ -> None
+
 
 type DataInput =
 
@@ -97,6 +102,32 @@ type DataInput =
         Html.div [
             prop.className "flex flex-col flex-grow gap-3"
             prop.children [
+                if validating.Error.IsSome then
+                    Daisy.modal.dialog [
+                        modal.open'
+                        prop.children [
+                            Daisy.modalBox.div [
+                                Html.form [
+                                    prop.method "dialog"
+                                    prop.children [
+                                        Daisy.button.button [
+                                            prop.className "btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                                            prop.onClick (fun _ -> setValidating ValidationStatus.Idle)
+                                            prop.text "X"
+                                        ]
+                                    ]
+                                ]
+                                Html.h3 [
+                                    prop.className "font-bold text-lg"
+                                    prop.text "Error"
+                                ]
+                                Html.p [
+                                    prop.className "py-4 text-sm"
+                                    prop.text (validating.Error.Value.Message)
+                                ]
+                            ]
+                        ]
+                    ]
                 Html.div [
                     prop.className "flex justify-between"
                     prop.children [
@@ -128,7 +159,9 @@ type DataInput =
                             prop.className "lg:file-input-lg cursor-pointer"
                             prop.onChange (fun (file: Browser.Types.File) ->
                                 let SizeLimit = 5000000
-                                if file.size > SizeLimit then
+                                if file.size > Shared.ServerConfig.FileSizeLimit then
+                                    setValidating (ValidationStatus.Invalid (new System.Exception("File size is too large. If you want to run predictions on larger files you need to run this service locally.")))
+                                elif file.size > SizeLimit then
                                     log "Upload large file"
                                     async {
                                         let blob = file.slice()

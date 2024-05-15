@@ -48,6 +48,10 @@ module EndPoints =
     let fastApiBrideEndpoint = "ws://localhost:8000/dataml"
     let fastApiBrideEndpointURI = Uri(fastApiBrideEndpoint)
 
+module ServerConfig =
+
+    let FileSizeLimit = (25 * 1024 * 1024) // 26,2144 mb
+
 module Route =
     let clientBuilder typeName methodName =
         sprintf "%s/api/%s/%s" EndPoints.siteUrl typeName methodName

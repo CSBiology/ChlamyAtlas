@@ -166,7 +166,7 @@ let configureServices (services : IServiceCollection) =
 
 let webhost (config: IWebHostBuilder) : IWebHostBuilder =
     config.UseKestrel(fun options ->
-        options.Limits.MaxRequestBodySize <- (25 * 1024 * 1024) // 26,2144 mb
+        options.Limits.MaxRequestBodySize <- ServerConfig.FileSizeLimit
         ()
     )
 
