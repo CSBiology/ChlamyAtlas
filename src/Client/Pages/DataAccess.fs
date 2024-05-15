@@ -86,21 +86,35 @@ module private Helper =
         |> ignore
 
     let dtoToString(dto: DataResponseDTO) =
+        let headers =
+            [|
+                "index"
+                "Header"
+                "Prediction"
+                "Chloropred"
+                "Qchloro"
+                "Mitopred"
+                "Qmito"
+                "Secrpred"
+                "Qsecr"
+            |]
+            |> String.concat "\t"
         dto.Data
         |> List.mapi (fun i x ->
             [|
                 string i
                 x.Header
+                x.FinalPred |> Array.map string |> String.concat ";"
                 string x.Chloropred
                 string x.Qchloro
                 string x.Mitopred
                 string x.Qmito
                 string x.Secrpred
                 string x.Qsecr
-                x.FinalPred |> Array.map string |> String.concat ";"
             |]
             |> String.concat "\t"
         )
+        |> fun tbody -> headers::tbody
         |> String.concat "\n"
 
     let downloadData (dto: DataResponseDTO) =
