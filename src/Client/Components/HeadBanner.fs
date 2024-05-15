@@ -16,6 +16,7 @@ type HeadBanner =
                     button.link 
                     prop.className "p-0 no-underline hover:underline"
                     prop.href Shared.Urls.BioRPTU
+                    prop.target.blank
                     prop.children [
                         Html.h2 [
                             prop.className "text-lg font-bold text-black"

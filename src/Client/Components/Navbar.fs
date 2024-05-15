@@ -27,7 +27,7 @@ type Navbar =
 
     [<ReactComponent>]
     static member Main() =
-        let csb_logo = StaticFile.import("../public/logo_small_dark.png")
+        let csb_logo = StaticFile.import("../public/csb-narrow-minimal-black.svg")
 
         let items = [
             Routing.Pages.Main
@@ -73,12 +73,13 @@ type Navbar =
                         ]
                     ]
                     Daisy.button.a [
-                        button.ghost
-                        button.animation
-                        button.link
-                        prop.className "cursor-default"
+                        prop.href Shared.Urls.CSBiology
+                        prop.target.blank
                         prop.children [
-                            Html.img [prop.src csb_logo]
+                            Html.img [
+                                prop.className "w-full h-full"
+                                prop.src csb_logo
+                            ]
                         ]
                     ]
                 ]

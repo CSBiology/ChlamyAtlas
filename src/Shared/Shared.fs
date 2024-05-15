@@ -20,6 +20,9 @@ module Urls =
     [<Literal>]
     let BioRPTU = @"https://bio.rptu.de"
 
+    [<Literal>]
+    let CSBiology = "https://csbiology.github.io"
+
     module ProteomIQon =
         
         [<Literal>]
