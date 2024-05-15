@@ -456,10 +456,10 @@ q-values exceed the cutoff, the protein is classified as "Cytoplasmic." """
                             | AccessStatusStatus.Success (DataResponseStatus.Validating) ->
                                 Html.h2 "Validating data input.."
                                 DataAccess.PeriodicFlip()
-                            | AccessStatusStatus.Success (DataResponseStatus.MLRunning batch) ->
+                            | AccessStatusStatus.Success (DataResponseStatus.MLRunning (batch,max)) ->
                                 Html.h2 "The machine is thinking.."
                                 Html.i [prop.className "fa-solid fa-robot text-6xl fa-bounce text-primary"; ]
-                                Html.div (sprintf "Batch: %A" batch)
+                                Html.div (sprintf "Batch: %i/%i" batch max)
                             | AccessStatusStatus.Success (DataResponseStatus.AnalysisRunning) ->
                                 Html.h2 "Processing results.."
                                 DataAccess.PeriodicFlip()

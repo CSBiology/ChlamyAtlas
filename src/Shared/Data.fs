@@ -41,7 +41,7 @@ type DataResponseStatus =
 | Starting
 /// Only used for large files.
 | Validating
-| MLRunning of int
+| MLRunning of current:int * max:int
 | AnalysisRunning
 | Finished
 | Error of string

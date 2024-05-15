@@ -43,6 +43,8 @@ open Websocket.Client
 let inline logws (id: Guid) format =
     Printf.kprintf (fun msg -> printfn "[%A] %s" id msg) format
 
+let BatchSize = 5
+
 type Message = {
     API: string
     Data: obj
@@ -60,7 +62,7 @@ type ResponseType = {
 
 let subscribeWebsocket (dro: DataResponse) =
     let id = dro.Id
-    Storage.Storage.Set(dro.Id, dro)
+    Storage.Storage.Set(id, {dro with Status = DataResponseStatus.Starting})
     let exitEvent = new ManualResetEvent(false)
     async {
         logws id "Subscribing to websocket .."
@@ -126,7 +128,7 @@ let subscribeWebsocket (dro: DataResponse) =
                     logws id "DataResponse received .. -- %i --" responseData.Batch
                     Storage.Storage.Update(id,fun current ->
                         { current with
-                            Status = DataResponseStatus.MLRunning(responseData.Batch)
+                            Status = DataResponseStatus.MLRunning(responseData.Batch, current.ItemCount/BatchSize)
                             PredictionData =
                                 let newData = responseData.Results
                                 newData@current.PredictionData
@@ -146,8 +148,8 @@ let subscribeWebsocket (dro: DataResponse) =
         logws id "transforming data to json .."
         let bytes = Encoding.UTF8.GetBytes(Json.JsonSerializer.Serialize<RequestType>(RequestType.init dro.InitData.Items))
         client.Start() |> ignore
-        Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.Starting})
         logws id "Sending data .."
+        Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.MLRunning(0,current.ItemCount/BatchSize)})
         client.Send(bytes) |> ignore
         //else
         //    Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.Error "Unable to connect to ml service." })
