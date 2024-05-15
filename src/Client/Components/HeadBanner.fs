@@ -15,6 +15,7 @@ type HeadBanner =
                 Daisy.button.a [
                     button.link 
                     prop.className "p-0 no-underline hover:underline"
+                    prop.href Shared.Urls.BioRPTU
                     prop.children [
                         Html.h2 [
                             prop.className "text-lg font-bold text-black"

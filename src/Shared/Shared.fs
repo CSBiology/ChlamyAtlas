@@ -17,6 +17,9 @@ module Urls =
     [<Literal>]
     let REFPaperAtlas = @"https://www.sciencedirect.com/science/article/pii/S0092867423006761?via%3Dihub"
 
+    [<Literal>]
+    let BioRPTU = @"https://bio.rptu.de"
+
     module ProteomIQon =
         
         [<Literal>]
