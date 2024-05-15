@@ -43,18 +43,6 @@ type Main =
                 Html.div [
                     prop.className "flex justify-between items-center gap-3 max-sm:flex-col-reverse"
                     prop.children [
-                        Daisy.tooltip [
-                            prop.custom("data-tip", "Access Commissioned Data")
-                            prop.className "max-sm:w-full"
-                            prop.children [
-                                Daisy.button.a [
-                                    prop.className "max-sm:w-[80%]"
-                                    button.neutral
-                                    prop.text "Data"
-                                    prop.href (Routing.DataAccess.ToRoute() |> Router.format)
-                                ]
-                            ]
-                        ]
                         Daisy.steps [
                             prop.className "w-full"
                             prop.children [

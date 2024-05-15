@@ -171,7 +171,7 @@ type DataInput =
                             prop.children [
                                 match validating with
                                 | Idle -> Html.span "Continue"
-                                | Validating -> Daisy.loading [loading.bars; color.textAccent]
+                                | Validating -> Daisy.loading [loading.bars;]
                                 | Invalid exn -> Html.span "Error"
                                 | Valid -> Html.i [
                                     prop.className [fa.faSolid; fa.faCheck; fa.faLg]

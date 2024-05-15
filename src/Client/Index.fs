@@ -73,7 +73,7 @@ type View =
                         minWidth= 200.00
                         scale= 1.00
                         scaleMobile= 1.00
-                        color = 0xe1e51e
+                        color = 15564081
                         backgroundColor = 0xa021a
                     |}
                     |> Some

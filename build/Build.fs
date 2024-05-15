@@ -34,11 +34,19 @@ Target.create "Bundle" (fun _ ->
     ]
     |> runParallel)
 
-Target.create "Run" (fun _ ->
+Target.create "Run" (fun e -> 
     run dotnet [ "build" ] sharedPath
     [
         "server", dotnet [ "watch"; "run" ] serverPath
-        "client", dotnet [ "fable"; "watch"; "-o"; "output"; "-s"; "--run"; "npx"; "vite" ] clientPath
+        "client", dotnet [ "fable"; "watch"; "-o"; "output"; "-s"; "--run"; "npx"; "vite"; ] clientPath
+    ]
+    |> runParallel)
+
+Target.create "Host" (fun e ->
+    run dotnet [ "build" ] sharedPath
+    [
+        "server", dotnet [ "watch"; "run" ] serverPath
+        "client", dotnet [ "fable"; "watch"; "-o"; "output"; "-s"; "--run"; "npx"; "vite"; "--host" ] clientPath
     ]
     |> runParallel)
 
@@ -64,6 +72,7 @@ let dependencies = [
     "Clean" ==> "InstallClient" ==> "InstallApi" ==> "Install"
 
     "Clean" ==> "Run"
+    "Clean" ==> "Host"
 
     "InstallClient" ==> "RunTests"
 ]

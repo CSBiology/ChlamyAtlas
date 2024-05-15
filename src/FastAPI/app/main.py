@@ -86,7 +86,7 @@ async def lifespan(app: FastAPI):
     ankh_base_model.clear()
 
 async def run_ml(websocket: WebSocket, data_input: list[DataInputItem]):
-    batch_size = 400
+    batch_size = 5
     for i in range(0, len(data_input), batch_size):
         batch = data_input[i:i+batch_size]
         results = prediction(
