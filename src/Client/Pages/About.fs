@@ -51,7 +51,7 @@ type About =
         )
         Components.MainCard.Main [
             Html.article [
-                prop.className "prose"
+                prop.className "prose 2xl:text-lg"
                 prop.children [
                     Html.h1 "About"
                     Html.p [

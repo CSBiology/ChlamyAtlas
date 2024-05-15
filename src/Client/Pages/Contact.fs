@@ -11,7 +11,7 @@ type Contact =
     static member Main() =
         Components.MainCard.Main [
             Html.article [
-                prop.className "prose"
+                prop.className "prose 2xl:text-lg"
                 prop.children [
                     Html.h1 "Contact"
 

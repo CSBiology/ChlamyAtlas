@@ -12,7 +12,23 @@ type MainCard =
             prop.className "flex flex-grow p-[0.5] sm:p-10 justify-center"
             prop.children [
                 Daisy.card [
-                    prop.className "bg-white/[.95] text-black h-fit w-[100%] md:w-[70%] lg:w-[50%] min-h-[80%] max-sm:rounded-none max-sm:min-h-[100%]"
+                    prop.className [
+                        // responsive-w
+                        "md:w-[70%]"
+                        "lg:w-[50%]"
+                        "xl:w-max"
+                        "xl:max-w-[50%]"
+                        "xl:min-w-[600px]"
+                        // responsive-h
+                        "max-sm:min-h-[100%]"
+                        "min-h-[80%]"
+                        //styling
+                        "bg-white/[.95]";
+                        "text-black"
+                        "h-fit"
+                        "w-[100%]"
+                        "max-sm:rounded-none"
+                    ]
                     card.bordered
                     prop.children [
                         Daisy.cardBody [

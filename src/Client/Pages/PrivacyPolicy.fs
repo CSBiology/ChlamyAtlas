@@ -14,14 +14,21 @@ type PrivacyPolicy =
         let contactEmail = Components.EmailLaunchAnchor.Main("email", Shared.Urls.ContactEmailObfuscated)
         Components.MainCard.Main [
             Html.article [
-                prop.className "prose"
+                prop.className "prose 2xl:text-lg"
                 prop.children [
                     Html.h1 "Privacy Policy"
                     Html.p [
                         Html.text $"Effective Date: "
                         Html.strong effectiveDate
                     ]
-                    Html.p $"Thank you for using our machine learning web service. Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website located at {websiteUrl} and our machine learning service."
+                    Html.p [
+                        Html.text "Thank you for using our machine learning web service. Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website located at "
+                        Html.a [
+                            prop.target "_blank"
+                            prop.text websiteUrl
+                        ]
+                        Html.text " and our machine learning service."
+                    ]
                     Html.p [
                         Html.text $"If you have any questions or concerns about our privacy practices, please contact us via "
                         contactEmail
