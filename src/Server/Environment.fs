@@ -63,9 +63,9 @@ let python_service_url =
 let TestGUID = System.Guid.NewGuid()
 
 let python_service_websocket =
-    let def = Uri(Shared.EndPoints.fastApiBrideEndpoint)
+    let def = Shared.EndPoints.fastApiBrideEndpoint
     let nullable = System.Environment.GetEnvironmentVariable(websocket_endpoint_key)
-    if isNull nullable then def else Uri(nullable)
+    if isNull nullable then def else nullable
 
 let python_service_storage_timespan =
     let def = TimeSpan.FromHours(1)

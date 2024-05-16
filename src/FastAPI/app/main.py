@@ -84,12 +84,12 @@ async def lifespan(app: FastAPI):
     ankh_base_model.clear()
 
 async def run_ml(websocket: WebSocket, data_input: list[DataInputItem]):
-    batch_size = 5
-    for i in range(0, len(data_input), batch_size):
-        batch_number = (i+batch_size/batch_size)
-        batch = data_input[i:i+batch_size]
+    data_length = len(data_input)
+    for i in range(data_length):
+        item_i = i + 1
+        input = data_input[i]
         results = await prediction(
-            batch,
+            [input],
             ankh_base_model[AnkhModels.tokenizer.value],
             ankh_base_model[AnkhModels.model.value],
             loc_classifiers[MyClassifiers.predchloro.value],
@@ -98,15 +98,16 @@ async def run_ml(websocket: WebSocket, data_input: list[DataInputItem]):
         )
         # results = [DataResponseItem(Header=e.Header, Predictions=[12.9,1923.,1283.2]) for e in batch]
         # await asyncio.sleep(60)
-        response_data = dict(Results=[result.model_dump() for result in results], Batch=batch_number)
+        response_data = dict(Results=[result.model_dump() for result in results], Batch=item_i)
         response = MyResponseType(**response_data)
         msg = Message(API=APIMessages.DataResponse.value, Data=response)
-        print("[WS] Sending batch --", batch_number, "-- ..")
+        print("[WS] Sending batch --",item_i,"/",data_length,"-- ..")
         await websocket.send_json(msg.model_dump())
+        # https://stackoverflow.com/a/72865252/12858021
+        await asyncio.sleep(0)
     print("[WS] Done. Closing..")
     await websocket.send_json(exitMsg.model_dump())
     print("[WS] Closing message sent")
-
 
 app = FastAPI(debug=True, lifespan=lifespan)
 
@@ -114,22 +115,23 @@ app = FastAPI(debug=True, lifespan=lifespan)
 async def root():
     return {"message": "Hello World"}
 
-@app.websocket("/dataml")
-async def websocket_endpoint(websocket: WebSocket):
+@app.websocket("/dataml/{id}")
+async def websocket_endpoint(websocket: WebSocket, id):
     print("[WS] Connected")
     await websocket.accept()
     # ping_task = asyncio.create_task(send_ping(websocket))
     try:
-        while True:
-            print ("[WS] Receiving data ..")
-            data_bytes = await websocket.receive_bytes()
-            print ("[WS] bytes received:", len(data_bytes))
-            data_json = data_bytes.decode('utf-8')
-            print ("[WS] json received ..", data_json[:100], "..")
-            data_map = json.loads(data_json)
-            data_input = RequestType(**data_map)
-            print ("[WS] Starting ml ..")
-            await run_ml(websocket, data_input.Fasta)
+        # To allow multiprocessing, it might be better to use: https://stackoverflow.com/questions/72703446/how-to-do-multiprocessing-with-non-blocking-fastapi-websockets
+        # while True:
+        print ("[WS] Receiving data ..")
+        data_bytes = await websocket.receive_bytes()
+        print ("[WS] bytes received:", len(data_bytes))
+        data_json = data_bytes.decode('utf-8')
+        print ("[WS] json received ..", data_json[:100], "..")
+        data_map = json.loads(data_json)
+        data_input = RequestType(**data_map)
+        print ("[WS] Starting ml ..")
+        await run_ml(websocket, data_input.Fasta)
     except WebSocketDisconnect:
         #on_disconnect
         print("[WS] Disconnected")

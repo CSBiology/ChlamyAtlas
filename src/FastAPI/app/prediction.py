@@ -146,7 +146,7 @@ class Loc_classifier (nn.Module):
         #prediction = F.sigmoid(x)
         return prediction
 
-async def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted):
+async def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted) -> list[DataResponseItem]:
     emb = [generate_embedding (seq.Sequence, tokenizer, model).view(-1,768) for seq in fasta]
     name_list = [seq.Header for seq in fasta]
     emb, mask = collate_fn(emb)

@@ -43,8 +43,6 @@ open Websocket.Client
 let inline logws (id: Guid) format =
     Printf.kprintf (fun msg -> printfn "[%A] %s" id msg) format
 
-let BatchSize = 5
-
 type Message = {
     API: string
     Data: obj
@@ -66,7 +64,8 @@ let subscribeWebsocket (dro: DataResponse) =
     let exitEvent = new ManualResetEvent(false)
     async {
         logws id "Subscribing to websocket .."
-        use client = new WebsocketClient(Environment.python_service_websocket)
+        let uri = Environment.python_service_websocket + "/" + id.ToString() |> Uri
+        use client = new WebsocketClient(uri)
         let closeAll(msg) =
             logws id "%s" msg
             client.Dispose()
@@ -126,10 +125,10 @@ let subscribeWebsocket (dro: DataResponse) =
                     closeAll("Python error")
                 | "DataResponse" ->
                     let responseData: ResponseType = Json.JsonSerializer.Deserialize<ResponseType>(msg.Data :?> Json.JsonElement)
-                    logws id "DataResponse received .. -- %i --" responseData.Batch
                     Storage.Storage.Update(id,fun current ->
+                        logws id "DataResponse received .. -- %i/%i --" responseData.Batch current.ItemCount
                         { current with
-                            Status = DataResponseStatus.MLRunning(responseData.Batch, current.ItemCount/BatchSize)
+                            Status = DataResponseStatus.MLRunning(responseData.Batch, current.ItemCount)
                             PredictionData =
                                 let newData = responseData.Results
                                 newData@current.PredictionData
@@ -149,7 +148,7 @@ let subscribeWebsocket (dro: DataResponse) =
         let bytes = Encoding.UTF8.GetBytes(Json.JsonSerializer.Serialize<RequestType>(RequestType.init dro.InitData.Items))
         client.Start() |> ignore
         logws id "Sending data .."
-        Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.MLRunning(0,current.ItemCount/BatchSize)})
+        Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.MLRunning(0,current.ItemCount)})
         client.Send(bytes) |> ignore
             
         exitEvent.WaitOne() |> ignore
