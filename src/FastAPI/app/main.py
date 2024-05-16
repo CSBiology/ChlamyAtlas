@@ -8,6 +8,7 @@ import ankh
 import torch
 from .prediction import Loc_classifier, prediction, DataResponseItem
 import os
+import asyncio
 
 class Message(BaseModel):
     API: str
@@ -17,6 +18,7 @@ class APIMessages(Enum):
     Error = 'Error'
     Exit = 'Exit'
     DataResponse = 'DataResponse'
+    Ping = 'Ping'
 
 exitMsg = Message(API=APIMessages.Exit.value, Data=None)
 
@@ -41,10 +43,6 @@ class MyResponseType(BaseModel):
 class DataInputItem(BaseModel):
     Header      : str
     Sequence    : str
-
-class DataResponseItem(BaseModel):
-    Header      : str
-    Predictions : list[float]
 
 class MyClassifiers(Enum):
     predchloro = 'predchloro'
@@ -88,8 +86,9 @@ async def lifespan(app: FastAPI):
 async def run_ml(websocket: WebSocket, data_input: list[DataInputItem]):
     batch_size = 5
     for i in range(0, len(data_input), batch_size):
+        batch_number = (i+batch_size/batch_size)
         batch = data_input[i:i+batch_size]
-        results = prediction(
+        results = await prediction(
             batch,
             ankh_base_model[AnkhModels.tokenizer.value],
             ankh_base_model[AnkhModels.model.value],
@@ -97,14 +96,17 @@ async def run_ml(websocket: WebSocket, data_input: list[DataInputItem]):
             loc_classifiers[MyClassifiers.predmito.value],
             loc_classifiers[MyClassifiers.predsp.value]
         )
-        response_data = dict(Results=[result.model_dump() for result in results], Batch=i)
+        # results = [DataResponseItem(Header=e.Header, Predictions=[12.9,1923.,1283.2]) for e in batch]
+        # await asyncio.sleep(60)
+        response_data = dict(Results=[result.model_dump() for result in results], Batch=batch_number)
         response = MyResponseType(**response_data)
         msg = Message(API=APIMessages.DataResponse.value, Data=response)
-        print("[WS] Sending batch --", i, "-- ..")
+        print("[WS] Sending batch --", batch_number, "-- ..")
         await websocket.send_json(msg.model_dump())
     print("[WS] Done. Closing..")
     await websocket.send_json(exitMsg.model_dump())
     print("[WS] Closing message sent")
+
 
 app = FastAPI(debug=True, lifespan=lifespan)
 
@@ -116,17 +118,18 @@ async def root():
 async def websocket_endpoint(websocket: WebSocket):
     print("[WS] Connected")
     await websocket.accept()
+    # ping_task = asyncio.create_task(send_ping(websocket))
     try:
-        # while True:
-        print ("[WS] Receiving data ..")
-        data_bytes = await websocket.receive_bytes()
-        print ("[WS] bytes received:", len(data_bytes))
-        data_json = data_bytes.decode('utf-8')
-        print ("[WS] json received ..", data_json[:100], "..")
-        data_map = json.loads(data_json)
-        data_input = RequestType(**data_map)
-        print ("[WS] Starting ml ..")
-        await run_ml(websocket, data_input.Fasta)
+        while True:
+            print ("[WS] Receiving data ..")
+            data_bytes = await websocket.receive_bytes()
+            print ("[WS] bytes received:", len(data_bytes))
+            data_json = data_bytes.decode('utf-8')
+            print ("[WS] json received ..", data_json[:100], "..")
+            data_map = json.loads(data_json)
+            data_input = RequestType(**data_map)
+            print ("[WS] Starting ml ..")
+            await run_ml(websocket, data_input.Fasta)
     except WebSocketDisconnect:
         #on_disconnect
         print("[WS] Disconnected")

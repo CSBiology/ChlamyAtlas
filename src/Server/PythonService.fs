@@ -94,6 +94,7 @@ let subscribeWebsocket (dro: DataResponse) =
                 let msg = Json.JsonSerializer.Deserialize<Message>(response.Text)
                 logws id "Message received: %A" msg.API
                 match msg.API with
+                | "Ping" -> () // This is just keep alive message
                 | "Exit" ->
                     closeAll("Closing client ..")
                     logws id "Starting analysis .."
@@ -134,7 +135,6 @@ let subscribeWebsocket (dro: DataResponse) =
                                 newData@current.PredictionData
                         }
                     )
-                    logws id "DataResponse received: %A" responseData.Batch
                 | msg ->
                     logws id "Unhandled Message received: %A" msg
             with
@@ -151,9 +151,6 @@ let subscribeWebsocket (dro: DataResponse) =
         logws id "Sending data .."
         Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.MLRunning(0,current.ItemCount/BatchSize)})
         client.Send(bytes) |> ignore
-        //else
-        //    Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.Error "Unable to connect to ml service." })
-        //    closeAll("Unable to connect to ml service.")
             
         exitEvent.WaitOne() |> ignore
     }
