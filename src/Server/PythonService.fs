@@ -65,17 +65,11 @@ let mlPrediction(dro: DataResponse) =
                     }
                 )
                 logws id "DataResponse received .. -- %i/%i --" latestItem itemCount
+            failwith "oh no!"
             logws id "Starting analysis .."
             Storage.Storage.Update(id, fun current -> { current with Status = DataResponseStatus.AnalysisRunning})
             let current = Storage.Storage.Get id
-            let res = Analysis.runAnalysis current
-            Storage.Storage.Update(id, fun current -> {
-                current with
-                    Status = DataResponseStatus.Finished
-                    ResultData = res
-                }
-            )
-            logws id "Analysis done. Task completed successfully .."
+            let! analysedData = Analysis.runAnalysis current
             // email
             match (Storage.EmailStorage.TryGet id) with
             | Some email -> 
@@ -84,18 +78,24 @@ let mlPrediction(dro: DataResponse) =
                 |> Async.RunSynchronously
             | None ->
                 logws id "Not subscribed to notification service .."
+            Storage.Storage.Update(id, fun current -> {
+                current with
+                    Status = DataResponseStatus.Finished
+                    ResultData = analysedData
+                }
+            )
+            logws id "Analysis done. Task completed successfully .."
         with
             | e ->
-                logws id "Error: %A" e.Message
-                Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.Error e.Message})
                 match (Storage.EmailStorage.TryGet id) with
                 | Some email -> 
-                    logws id "Sending notification email .."
+                    logws id "Sending error notification email .."
                     Email.sendErrorNotification (email, e.Message)
                     |> Async.RunSynchronously
                 | None ->
                     logws id "Not subscribed to notification service .."
-
+                logws id "Error: %A" e.Message
+                Storage.Storage.Update(id,fun current -> { current with Status = DataResponseStatus.Error e.Message})
     }
     |> Async.AwaitTask
         

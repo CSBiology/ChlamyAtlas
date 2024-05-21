@@ -41,7 +41,7 @@ let lsAPIv1 (ctx: HttpContext): ILargeFileApiv1 = {
                     match validationResult with
                     | Ok data0 ->
                         let data = {dro0 with InitData.Items = data0}
-                        do! PythonService.controller data
+                        do! PythonService.mlPrediction data
                     | Error exn ->
                         Storage.Storage.Update(guid, fun dr -> {dr with Status = DataResponseStatus.Error (exn.Message)})
                 } |> Async.Start
@@ -69,22 +69,21 @@ let predictionAPIv1: IPredictionApiv1 = {
         let guid = Storage.generateNewGuid()
         async {
             let dro = DataResponse.init (guid, data)
-            PythonService.controller dro |> Async.Start
+            PythonService.mlPrediction dro |> Async.Start
             return guid
         }
     PutEmail = fun (id, email) ->
         async {
             match Storage.Storage.TryGet id with // only subscribe if data exists
-            | Some dro ->
+            | Some {Status = DataResponseStatus.Finished} ->
+                Email.sendNotification email |> Async.Start
+            | Some {Status = DataResponseStatus.Error msg} ->
+                Email.sendErrorNotification (email, msg) |> Async.Start
+            | Some _ ->
                 match Storage.EmailStorage.TryGet id with // only subscribe if no email already subscribed
                 | None ->
                     Storage.EmailStorage.Set (id, email)
-                    async {
-                        do! Email.sendConfirmation email
-                        if dro.IsExited then
-                            do! Email.sendNotification email
-                    }
-                    |> Async.Start
+                    Email.sendConfirmation email |> Async.Start
                 | Some _ -> ()
             | _ -> ()
             return ()

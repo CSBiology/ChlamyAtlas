@@ -4,7 +4,7 @@ open System
 open System.Net.Mail
 open System.Net
 
-let SMPTClient =
+let SMPTClient() =
     let config = Environment.EmailConfig
     let c = new SmtpClient(config.Server, config.Port)
     c.EnableSsl <- true
@@ -12,12 +12,13 @@ let SMPTClient =
     c
 
 let emailSend(mail:MailMessage) =
+    let client = SMPTClient()
     async {
         try
             if not Environment.missingEmailCredentials then
-                do! SMPTClient.SendMailAsync mail |> Async.AwaitTask
+                do! client.SendMailAsync mail |> Async.AwaitTask
         with
-            | e -> printfn "[Email] %s" e.Message
+            | e -> printfn "[Email] SendError: %s" e.Message
     }
 
 let createMessage(from: string, toEmail: string, subject: string, body: string) =
@@ -28,7 +29,7 @@ let createMessage(from: string, toEmail: string, subject: string, body: string) 
         Some msg
     with
         | e ->
-            printfn "[Email] %s" e.Message
+            printfn "[Email] CreateError: %s" e.Message
             None
 
 open Giraffe.ViewEngine
@@ -97,7 +98,9 @@ let errorEmailBody (error: string) : string =
                 h3 [] [ str "Prediction Failed"]
                 p [] [ str "Dear User," ]
                 p [] [ str "We regret to inform you that your data analysis has failed. The error message is as follows:"]
-                p [] [ str error ]
+                blockquote [] [
+                    code [] [ pre [] [str error] ]
+                ]
                 p [] [ str "Please review the error message and try again. Should you require further assistance, please don't hesitate to reach out to us."]
                 p [] [ str "Warm regards,"]
                 p [] [ str "CSB-Team"]
