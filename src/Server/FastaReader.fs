@@ -5,7 +5,7 @@ open System.IO
 open Shared
 
 // if you run this locally change this value to allow parsing more values at once
-let maxCount = 1000
+let maxCount = 9999999
 
 let private read (reader:TextReader) =
     let mutable noNameIterator = 0

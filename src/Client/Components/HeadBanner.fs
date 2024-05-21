@@ -7,7 +7,7 @@ open Feliz.DaisyUI
 type HeadBanner =
 
     static member Main() =
-        let rptu_logo = StaticFile.import("../public/rptu_web_logo_schwarz.svg")
+        let rptu_logo = StaticFile.import("../img/rptu_web_logo_schwarz.svg")
         Html.nav [
             prop.className "bg-white px-6 py-3"
             prop.children [

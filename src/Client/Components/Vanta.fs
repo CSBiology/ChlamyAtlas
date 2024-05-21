@@ -18,6 +18,7 @@ let defaultConfig (elementId: string) =
 
 [<AllowNullLiteral>]
 type IVanta =
+    [<Emit("$0.destroy")>]
     member this.destroy() = nativeOnly
 
     interface IDisposable with

@@ -27,7 +27,7 @@ type Navbar =
 
     [<ReactComponent>]
     static member Main() =
-        let csb_logo = StaticFile.import("../public/csb-narrow-minimal-black.svg")
+        let csb_logo = StaticFile.import("../img/csb-narrow-minimal-black.svg")
 
         let items = [
             Routing.Pages.Main
@@ -77,7 +77,7 @@ type Navbar =
                         prop.target.blank
                         prop.children [
                             Html.img [
-                                prop.className "w-full h-full"
+                                prop.className "w-full h-full py-2"
                                 prop.src csb_logo
                             ]
                         ]

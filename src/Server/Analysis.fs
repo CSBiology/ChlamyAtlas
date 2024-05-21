@@ -82,11 +82,5 @@ let private analyzePrediction (predictions: DataResponseItem list) (cutoff: floa
     |> List.map (fun x -> addQValuesAndPrediction x createChloroQ createMitoQ createSecrQ cutoff)
 
 let runAnalysis (data: Shared.DataResponse) =
-    async {
-        let nextData = {
-            data with
-                Status = DataResponseStatus.Finished
-                ResultData = analyzePrediction data.PredictionData data.InitData.Config.CutOff
-        }
-        return nextData
-    }
+    printfn "%A" data.PredictionData
+    analyzePrediction data.PredictionData data.InitData.Config.CutOff

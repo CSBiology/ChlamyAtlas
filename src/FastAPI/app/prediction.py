@@ -3,17 +3,13 @@ import torch
 from pathlib import Path
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
-from torch import nn
+from torch import Tensor, nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
-import json
-from pydantic import BaseModel
+from .request_types import DataInputItem, DataResponseItem
 
-class DataResponseItem(BaseModel):
-    Header      : str
-    Predictions : list[float]
-
-def collate_fn (batch):
+def collate_fn (batch: Tensor):
+    batch = batch.unsqueeze(0)
     pad_value = 0.
     features = pad_sequence(batch, batch_first=True, padding_value=pad_value)
     mask = ~(features == pad_value)
@@ -146,9 +142,9 @@ class Loc_classifier (nn.Module):
         #prediction = F.sigmoid(x)
         return prediction
 
-async def prediction (fasta, tokenizer, model, predchloro, predmito, predsecreted) -> list[DataResponseItem]:
-    emb = [generate_embedding (seq.Sequence, tokenizer, model).view(-1,768) for seq in fasta]
-    name_list = [seq.Header for seq in fasta]
+def prediction (input: DataInputItem, tokenizer, model, predchloro, predmito, predsecreted) -> DataResponseItem:
+    emb = generate_embedding (input.Sequence, tokenizer, model).view(-1,768)
+    name = input.Header
     emb, mask = collate_fn(emb)
     with torch.no_grad():
         prediction_chloro = predchloro(emb,mask)
@@ -162,8 +158,5 @@ async def prediction (fasta, tokenizer, model, predchloro, predmito, predsecrete
         prediction_sp = prediction_sp[:,0]
         final_prediction = torch.stack((prediction_chloro, prediction_mito, prediction_sp), dim=1)
         final_prediction = final_prediction.tolist()
-    result = [
-        DataResponseItem(Header=name, Predictions=final_prediction[i])
-        for i,name in enumerate(name_list)
-    ]
+    result = DataResponseItem(Header=name, Predictions=final_prediction[0])
     return result

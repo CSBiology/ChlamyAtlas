@@ -90,6 +90,22 @@ let notificationEmailBody =
     ]
     |> RenderView.AsString.htmlDocument
 
+let errorEmailBody (error: string) : string =
+    html [] [
+        body [] [
+            section [] [
+                h3 [] [ str "Prediction Failed"]
+                p [] [ str "Dear User," ]
+                p [] [ str "We regret to inform you that your data analysis has failed. The error message is as follows:"]
+                p [] [ str error ]
+                p [] [ str "Please review the error message and try again. Should you require further assistance, please don't hesitate to reach out to us."]
+                p [] [ str "Warm regards,"]
+                p [] [ str "CSB-Team"]
+            ]
+        ]
+    ]
+    |> RenderView.AsString.htmlDocument
+
 let sendConfirmation(targetEmail: string) =
     match createMessage(
             Environment.EmailConfig.Email,
@@ -107,6 +123,17 @@ let sendNotification(targetEmail: string) =
             targetEmail,
             "CSB - Notification: Your Data Analysis is Ready!",
             notificationEmailBody
+        ) with
+    | Some msg ->
+        emailSend msg
+    | None -> async.Zero()
+
+let sendErrorNotification(targetEmail: string, error: string) =
+    match createMessage(
+            Environment.EmailConfig.Email,
+            targetEmail,
+            "CSB - Error: Prediction failed",
+            errorEmailBody error
         ) with
     | Some msg ->
         emailSend msg

@@ -81,6 +81,11 @@ type DataResponse = {
 } with
     member this.ItemCount = this.InitData.Items.Length
     member this.AllItemsProcessed = this.PredictionData.Length = this.InitData.Items.Length && not this.PredictionData.IsEmpty
+    member this.GetMissingPredictionItems0() =
+        let predictedDataCount = this.PredictionData.Length
+        this.InitData.Items |> Array.skip predictedDataCount
+    member this.NextData0Item() =
+        this.GetMissingPredictionItems0() |> Array.tryHead
     static member init(guid, data) = {
         Id = guid
         Status = DataResponseStatus.Starting

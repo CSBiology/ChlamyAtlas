@@ -41,7 +41,7 @@ let lsAPIv1 (ctx: HttpContext): ILargeFileApiv1 = {
                     match validationResult with
                     | Ok data0 ->
                         let data = {dro0 with InitData.Items = data0}
-                        PythonService.subscribeWebsocket data
+                        do! PythonService.controller data
                     | Error exn ->
                         Storage.Storage.Update(guid, fun dr -> {dr with Status = DataResponseStatus.Error (exn.Message)})
                 } |> Async.Start
@@ -69,7 +69,7 @@ let predictionAPIv1: IPredictionApiv1 = {
         let guid = Storage.generateNewGuid()
         async {
             let dro = DataResponse.init (guid, data)
-            PythonService.subscribeWebsocket dro
+            PythonService.controller dro |> Async.Start
             return guid
         }
     PutEmail = fun (id, email) ->
