@@ -65,7 +65,6 @@ let mlPrediction(dro: DataResponse) =
                     }
                 )
                 logws id "DataResponse received .. -- %i/%i --" latestItem itemCount
-            failwith "oh no!"
             logws id "Starting analysis .."
             Storage.Storage.Update(id, fun current -> { current with Status = DataResponseStatus.AnalysisRunning})
             let current = Storage.Storage.Get id

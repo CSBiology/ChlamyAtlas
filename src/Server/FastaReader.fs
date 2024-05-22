@@ -4,6 +4,13 @@ open System
 open System.IO
 open Shared
 
+open System.Text
+open System.Text.RegularExpressions
+
+let regexPattern = @"\|(?<uid>[\S]+?)\|"
+
+let regex = Regex(regexPattern)
+
 // if you run this locally change this value to allow parsing more values at once
 let maxCount = 9999999
 
@@ -24,7 +31,12 @@ let private read (reader:TextReader) =
             else
                 readRecords acc newHeader line'
         | line when line.StartsWith(">") ->
-            let newHeader = line.Substring(1)
+            let newHeader =
+                let raw = line.Substring(1)
+                let m = regex.Match(raw)
+                match m.Success with
+                | true -> m.Groups.["uid"].Value
+                | false -> raw
             iterator <- iterator + 1
             if currentHeader <> "" && currentSeq <> "" then
                 readRecords ({ Header = currentHeader; Sequence = currentSeq } :: acc) newHeader ""
