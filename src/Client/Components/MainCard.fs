@@ -20,7 +20,7 @@ type MainCard =
                         "xl:min-w-[600px]"
                         // responsive-h
                         "max-sm:min-h-[75vh]"
-                        "min-h-[80%]"
+                        "min-h-[100%]"
                         //styling
                         "bg-white/[.95]";
                         "text-black"
