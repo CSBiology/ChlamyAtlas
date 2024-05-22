@@ -9,23 +9,19 @@ open App
 
 let init () =
     let model = Model.init()
-    let cmd = Cmd.none
+    let cmd = Cmd.ofMsg GetVersions
     model, cmd
 
 let update (msg: Msg) (model: Model) =
     match msg with
-    | UpdateVersion v -> {model with Version = v}, Cmd.none
-    | SetCurrentTime v -> {model with CurrentTimerValue = v}, Cmd.none
-    | GetFastAPIMessage ->
+    | GetVersions ->
         let cmd =
             Cmd.OfAsync.perform
-                Api.appApi.GetVersion
+                Api.appApi.GetVersions
                 ()
-                UpdateVersion
+                GetVersionsResponse
         model, cmd
-    | GetFastAPIMessageResponse hw ->
-        let nextModel = {model with FastAPIMessage = hw.message}
-        nextModel, Cmd.none
+    | GetVersionsResponse versions -> {model with Version = versions}, Cmd.none
 
 [<ReactComponent>]
 let private Main (model) dispatch =

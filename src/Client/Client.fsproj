@@ -16,6 +16,7 @@
         <None Include="tailwind.config.js" />
         <None Include="paket.references" />
         <Compile Include="ReactContext.fs" />
+        <Compile Include="Components\Footer.fs" />
         <Compile Include="Components\EmailLaunchAnchor.fs" />
         <Compile Include="Components\Vanta.fs" />
         <Compile Include="Components\Examples.fs" />

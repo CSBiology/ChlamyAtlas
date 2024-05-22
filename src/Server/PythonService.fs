@@ -39,6 +39,15 @@ open Helper
 let inline logws (id: Guid) format =
     Printf.kprintf (fun msg -> printfn "[%A] %s" id msg) format
 
+let getVersion() =
+    task {
+        let! response = pythonServiceClient().GetAsync(Environment.python_service_url + "/predictor_version")
+        let! content = response.Content.ReadAsStringAsync()
+        let version = JsonConvert.DeserializeObject<{|Version: string|} >(content)
+        return version.Version
+    }
+    |> Async.AwaitTask
+
 let mlPrediction(dro: DataResponse) =
     let id = dro.Id
     Storage.Storage.Set(id, {dro with Status = DataResponseStatus.Starting})

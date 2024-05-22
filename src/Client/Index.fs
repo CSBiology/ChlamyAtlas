@@ -93,26 +93,6 @@ type View =
                         Html.div [
                             prop.className "flex flex-col flex-grow"
                             prop.children [
-                                //Daisy.join [
-                                //    Daisy.button.button [
-                                //        prop.onClick(fun e ->
-                                //            Api.appApi.Log ()
-                                //            |> Async.StartImmediate
-                                //        )
-                                //        prop.text "log"
-                                //    ]
-                                //    Daisy.button.button [
-                                //        prop.onClick(fun e ->
-                                //            async {
-                                //                let data = DataInput.init [|for i in 0 .. 77 do yield {Number = i}|]
-                                //                let! guid = Api.predictionApi.StartEvaluation data
-                                //                log(guid)
-                                //            }
-                                //            |> Async.StartImmediate
-                                //        )
-                                //        prop.text "Test"
-                                //    ]
-                                //]
                                 match page with
                                 | Main -> Pages.Main.Main()
                                 | DataAccess -> Pages.DataAccess.Main()
@@ -122,6 +102,7 @@ type View =
                                 | NotFound -> Html.h1 "404 - Not Found"
                             ]
                         ]
+                        Components.Footer.Main(model)
                     ]
                 ]
             ]

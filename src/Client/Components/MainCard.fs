@@ -1,6 +1,5 @@
 namespace Components
 
-
 open Fable.Core
 open Feliz
 open Feliz.DaisyUI
@@ -9,7 +8,7 @@ type MainCard =
     static member Main(children: ReactElement list) =
         Html.div [
             prop.id "main-predictor"
-            prop.className "flex flex-grow p-[0.5] sm:p-10 justify-center"
+            prop.className "flex flex-grow p-[0.5] sm:p-10 justify-center flex-col items-center"
             prop.children [
                 Daisy.card [
                     prop.className [
@@ -20,7 +19,7 @@ type MainCard =
                         "xl:max-w-[50%]"
                         "xl:min-w-[600px]"
                         // responsive-h
-                        "max-sm:min-h-[100%]"
+                        "max-sm:min-h-[75vh]"
                         "min-h-[80%]"
                         //styling
                         "bg-white/[.95]";

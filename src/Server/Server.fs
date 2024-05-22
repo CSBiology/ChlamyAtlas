@@ -27,7 +27,7 @@ let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) : ErrorResu
 let DefaultAnoFail = "No data accessible."
 
 [<LiteralAttribute>]
-let AppVersion = "0.0.1"
+let AppVersion = "1.0.0"
 
 let lsAPIv1 (ctx: HttpContext): ILargeFileApiv1 = {
     UploadLargeFile = fun (bytes) -> async {
@@ -55,7 +55,11 @@ let lsAPIv1 (ctx: HttpContext): ILargeFileApiv1 = {
 }
 
 let appAPIv1: IAppApiv1 = {
-    GetVersion = fun () -> async { return AppVersion }
+    GetVersions = fun () -> async {
+        let! mlVersion = PythonService.getVersion()
+        let uiVersion = AppVersion
+        return Shared.Versions.init(uiVersion, mlVersion)
+    }
     Log = fun () -> async {
         printfn "--LOG_START--"
         Storage.Storage.Get(Environment.TestGUID) |> printfn "%A"
