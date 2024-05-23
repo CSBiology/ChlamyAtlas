@@ -5,8 +5,6 @@ from ..request_types import DataInputItem, AnkhModels, MyClassifiers
 from ..prediction import prediction
 
 def run_ml(data_input: DataInputItem):
-    print(loc_classifiers.keys())
-    print(ankh_base_model.keys())
     return prediction(
         data_input,
         ankh_base_model[AnkhModels.tokenizer.value],
@@ -23,8 +21,8 @@ router = APIRouter(
 
 @router.post("/predict", tags=["latest"])
 async def predict(info: DataInputItem):
-    print(info)
+    print("[Predict]", info.Header)
     prediction = run_ml(info)
-    print(prediction)
+    print("[Return]", prediction)
     return {"Prediction": prediction}
 

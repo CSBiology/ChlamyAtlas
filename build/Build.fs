@@ -1,20 +1,17 @@
 open Fake.Core
 open Fake.IO
-open Farmer
-open Farmer.Builders
 
 open Helpers
 
 initializeContext ()
 
-let sharedPath = Path.getFullName "src/Shared"
-let serverPath = Path.getFullName "src/Server"
-let clientPath = Path.getFullName "src/Client"
-let deployPath = Path.getFullName "deploy"
-let sharedTestsPath = Path.getFullName "tests/Shared"
-let serverTestsPath = Path.getFullName "tests/Server"
-let clientTestsPath = Path.getFullName "tests/Client"
-let fastApiPath = Path.getFullName "./src/FastApi"
+let _ = DockerTasks.dockerBundle
+let _ = DockerTasks.dockerTest
+let _ = DockerTasks.dockerPublish
+let _ = DockerTasks.dockerTestProduction
+let _ = Versions.versions
+
+open ProjectInfo
 
 Target.create "Clean" (fun _ ->
     Shell.cleanDir deployPath
@@ -75,6 +72,12 @@ let dependencies = [
     "Clean" ==> "Host"
 
     "InstallClient" ==> "RunTests"
+
+    // Without Bundle before DockerBundle it will not work
+    "Clean"
+        ==> "InstallClient"
+        ==> "Bundle"
+        ==> "DockerBundle"
 ]
 
 [<EntryPoint>]

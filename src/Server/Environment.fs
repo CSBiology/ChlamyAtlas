@@ -25,7 +25,7 @@ module EmailKeys =
 open Microsoft.Extensions.Configuration
 
 let mutable missingEmailCredentials = false
-let internal EmailConfig =
+let internal EmailConfig() =
     let config = (new ConfigurationBuilder()).AddUserSecrets("adad89d0-732c-4735-8c06-0b0000a3b1d9").Build()
     let accessKey(key: string) =
         let userSecret = config.[sprintf "email:%s" key]
@@ -55,19 +55,19 @@ let private websocket_endpoint_key = "PYTHON_SERVICE_WS"
 [<Literal>]
 let private storage_timespan_key = "PYTHON_SERVICE_STORAGE_TIMESPAN"
 
-let python_service_url =
+let python_service_url() =
     let def = "http://localhost:8000"
     let nullable = System.Environment.GetEnvironmentVariable(url_key)
     if isNull nullable then def else nullable
 
 let TestGUID = System.Guid.NewGuid()
 
-let python_service_websocket =
+let python_service_websocket() =
     let def = Shared.EndPoints.fastApiBrideEndpoint
     let nullable = System.Environment.GetEnvironmentVariable(websocket_endpoint_key)
     if isNull nullable then def else nullable
 
-let python_service_storage_timespan =
+let python_service_storage_timespan() =
     let def = TimeSpan.FromHours(1)
     let nullable = System.Environment.GetEnvironmentVariable(storage_timespan_key)
     if isNull nullable then def else int(nullable) |> TimeSpan.FromDays

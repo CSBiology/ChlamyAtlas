@@ -55,14 +55,37 @@ let lsAPIv1 (ctx: HttpContext): ILargeFileApiv1 = {
 }
 
 let appAPIv1: IAppApiv1 = {
+    HelloWorld = fun () -> async {
+        return "Hello World"
+    }
     GetVersions = fun () -> async {
-        let! mlVersion = PythonService.getVersion()
-        let uiVersion = AppVersion
+        let! mlVersion = async {
+            try
+                let! v = PythonService.getVersion()
+                return Success v
+            with
+                | exn ->
+                    return NotAvailable exn.Message
+        }
+        let uiVersion = Success AppVersion
         return Shared.Versions.init(uiVersion, mlVersion)
     }
     Log = fun () -> async {
         printfn "--LOG_START--"
-        Storage.Storage.Get(Environment.TestGUID) |> printfn "%A"
+        //Console.WriteLine "check env function"
+        //let def = "http://localhost:8000"
+        //Console.WriteLine "right before nullable"
+        //let nullable =
+        //    try
+        //        System.Environment.GetEnvironmentVariable("PYTHON_SERVICE_URL")
+        //    with
+        //        | exn ->
+        //            printfn "%A" exn
+        //            raise exn
+        //printfn "Show nullable: %A" nullable
+        //printfn "Show def: %A" def
+        //printfn "is null: %A" (isNull nullable)
+        //printfn "Result: %A" (if isNull nullable then def else nullable)
         printfn "--LOG_END--"
         return ()
     }
@@ -182,6 +205,7 @@ let app = application {
     use_static "public"
     use_gzip
     webhost_config webhost
+    url "http://0.0.0.0:5000"
 }
 
 [<EntryPoint>]

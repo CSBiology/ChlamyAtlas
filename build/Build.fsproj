@@ -7,8 +7,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Helpers.fs" />
+    <Compile Include="ProjectInfo.fs" />
+    <Compile Include="Versions.fs" />
+    <Compile Include="DockerTasks.fs" />
     <Compile Include="Build.fs" />
-    <None Include="paket.references" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
+  <ItemGroup>
+    <PackageReference Include="BlackFox.Fake.BuildTask" Version="0.1.3" />
+    <PackageReference Include="Fake.Core.Target" Version="6.0.0" />
+    <PackageReference Include="Fake.Core.UserInput" Version="6.0.0" />
+    <PackageReference Include="Fake.IO.FileSystem" Version="6.0.0" />
+  </ItemGroup>
 </Project>

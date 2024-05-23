@@ -5,7 +5,7 @@ open System.Net.Mail
 open System.Net
 
 let SMPTClient() =
-    let config = Environment.EmailConfig
+    let config = Environment.EmailConfig()
     let c = new SmtpClient(config.Server, config.Port)
     c.EnableSsl <- true
     c.Credentials <- new NetworkCredential(config.AccountName,config.Password);
@@ -59,7 +59,7 @@ let confirmationEmailBody =
                     ]
                     li [] [
                         b [] [ str "Privacy:"]
-                        rawText $" Your data results will be stored for <u>{Environment.python_service_storage_timespan.TotalDays}</u> days, afterwards all data and personal information will be fully deleted. Your data stays with us, we do not use or support third party services!"
+                        rawText $" Your data results will be stored for <u>{Environment.python_service_storage_timespan().TotalDays}</u> days, afterwards all data and personal information will be fully deleted. Your data stays with us, we do not use or support third party services!"
                             
                     ]
                 ]
@@ -80,7 +80,7 @@ let notificationEmailBody =
                 p [] [ str "Your data analysis is now complete and ready for your review!"]
                 p [] [
                     str "You can access your analysis results by visiting our website and clicking on the 'Data Access' tab. Your data will be stored for "
-                    u [] [ str (Environment.python_service_storage_timespan.TotalDays |> string) ]
+                    u [] [ str (Environment.python_service_storage_timespan().TotalDays |> string) ]
                     str " days after sending this email."
                 ]
                 p [] [ str "We hope that these insights will be valuable to you and your project. Should you have any questions or require further assistance, please don't hesitate to reach out to us."]
@@ -111,7 +111,7 @@ let errorEmailBody (error: string) : string =
 
 let sendConfirmation(targetEmail: string) =
     match createMessage(
-            Environment.EmailConfig.Email,
+            Environment.EmailConfig().Email,
             targetEmail,
             "CSB - Confirmation: Registration to Notification Service",
             confirmationEmailBody
@@ -122,7 +122,7 @@ let sendConfirmation(targetEmail: string) =
 
 let sendNotification(targetEmail: string) =
     match createMessage(
-            Environment.EmailConfig.Email,
+            Environment.EmailConfig().Email,
             targetEmail,
             "CSB - Notification: Your Data Analysis is Ready!",
             notificationEmailBody
@@ -133,7 +133,7 @@ let sendNotification(targetEmail: string) =
 
 let sendErrorNotification(targetEmail: string, error: string) =
     match createMessage(
-            Environment.EmailConfig.Email,
+            Environment.EmailConfig().Email,
             targetEmail,
             "CSB - Error: Prediction failed",
             errorEmailBody error

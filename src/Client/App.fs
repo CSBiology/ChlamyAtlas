@@ -5,7 +5,7 @@ open Elmish.React
 open Fable.Core.JsInterop
 open Feliz
 open App
-
+open Shared
 
 let init () =
     let model = Model.init()
@@ -16,12 +16,16 @@ let update (msg: Msg) (model: Model) =
     match msg with
     | GetVersions ->
         let cmd =
-            Cmd.OfAsync.perform
+            Cmd.OfAsync.either
                 Api.appApi.GetVersions
                 ()
                 GetVersionsResponse
+                (fun exn -> Versions.init(NotAvailable exn.Message, NotAvailable exn.Message) |> GetVersionsResponse)
         model, cmd
-    | GetVersionsResponse versions -> {model with Version = versions}, Cmd.none
+    | GetVersionsResponse versions ->
+        log "[Loaded Versions]"
+        log versions
+        {model with Version = versions}, Cmd.none
 
 [<ReactComponent>]
 let private Main (model) dispatch =

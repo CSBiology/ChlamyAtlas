@@ -15,10 +15,10 @@ type CacheManager<'A>() =
     member this.TryGet(key: Guid) : 'A option =
         let exists, item = cache.TryGetValue<'A>(key)
         if exists then Some item else None
-    member this.Set(key: Guid, value: 'A) = cache.Set(key, value, Environment.python_service_storage_timespan) |> ignore
+    member this.Set(key: Guid, value: 'A) = cache.Set(key, value, Environment.python_service_storage_timespan()) |> ignore
     member this.Update(key: Guid, f: 'A -> 'Ä) =
         let value = cache.Get<'A>(key)
-        cache.Set(key, f value, Environment.python_service_storage_timespan) |> ignore
+        cache.Set(key, f value, Environment.python_service_storage_timespan()) |> ignore
     member this.Remove(key: Guid) = cache.Remove(key)
     member this.KeyExists(key: Guid) = cache.TryGetValue(key) |> fst
     member this.Count = cache.Count

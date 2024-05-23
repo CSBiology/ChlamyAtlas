@@ -355,7 +355,6 @@ q-values exceed the cutoff, the protein is classified as "Cytoplasmic." """
                                         let innerIndex = i+1
                                         let itemsBefore = (activeChunk) * chunkSize
                                         let outerIndex = innerIndex + itemsBefore
-                                        log(innerIndex, (activeChunk+1))
                                         Html.tr [
                                             Html.th (outerIndex)
                                             for field in [|

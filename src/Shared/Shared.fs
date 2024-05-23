@@ -62,13 +62,20 @@ module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
 
+type VersionState =
+    | Loading
+    | Success of string
+    | NotAvailable of string
+
 type Versions = {
-    UIVersion: string option
-    MLVersion: string option
+    UIVersion: VersionState
+    MLVersion: VersionState
 } with
-    static member init (?uiVersion: string, ?mlVersion: string) = { UIVersion = uiVersion; MLVersion = mlVersion }
+    static member init (?uiVersion: VersionState, ?mlVersion: VersionState) = { UIVersion = defaultArg uiVersion VersionState.Loading; MLVersion = defaultArg mlVersion VersionState.Loading }
+    static member init (uiVersion: string, mlVersion: string) = { UIVersion = VersionState.Success uiVersion; MLVersion = VersionState.Success mlVersion}
 
 type IAppApiv1 = {
+    HelloWorld: unit -> Async<string>
     GetVersions: unit -> Async<Versions>
     Log: unit -> Async<unit>
 }

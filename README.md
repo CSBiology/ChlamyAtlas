@@ -4,7 +4,7 @@ A web UI for optimised versions of the models published in Wang et al. 2023.
 
 # Supported formats
 
-ChlamyAtlas expects input in either the FASTA format or as pure amino acid sequence. 
+ChlamyAtlas expects input in either the FASTA format or as pure amino acid sequence.
 The FASTA format consists of two building blocks. The first is a description which explains the following sequence. This description starts with ">" and is written in a single line. The amino acid sequence follows in the next line and can span multiple lines. An example for this format is:
 ```
 >sp|A0A178WF56|CSTM3_ARATH Protein CYSTEINE-RICH TRANSMEMBRANE MODULE 3 OS=Arabidopsis thaliana OX=3702 GN=CYSTM3 PE=1 SV=1
@@ -40,6 +40,70 @@ ASMWTVDDRGSNTNTTETRGNKVDGRSMRGKRKRPEPRTPILKKLSKEERAKARERAKGR
 TMEKMMMKMKGRSQLVKVVEEDAHDHGEIIKNNNRSQVNRSSFEMTHCEDKIEELCKNDR
 FAVCNEFIMNKKDHISNESYDLVNYKPNSSFPVINHHRSQGAANSIEQHQFTDLHYSFGA
 KPRDLMHNYQNMY
+```
+
+# Docker
+
+## Environment Variables
+
+- **NET_EMAIL_EMAIL**: Email address to send emails from
+
+  Default: Set via user secrets
+
+- **NET_EMAIL_ACCOUNTNAME**: Email account name to send emails from
+
+    Default: Set via user secrets
+
+- **NET_EMAIL_PASSWORD**: Email account password to send emails from
+
+    Default: Set via user secrets
+
+- **NET_EMAIL_SERVER**: Email server to send emails from
+
+    Default: Set via user secrets
+
+- **NET_EMAIL_PORT**: Email server port to send emails from
+
+    Default: Set via user secrets
+
+- **PYTHON_SERVICE_URL**: Sets the url for the api predictor backend.
+
+    Default: `http://localhost:8000`
+
+    Remarks: In docker compose this could be `http://host.docker.internal:8000`
+
+    Remarks: On Linux might require:
+
+    ```
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ```
+
+- **PYTHON_SERVICE_STORAGE_TIMESPAN**: How long the user data should be stored
+
+    Default: 1 Hour
+
+## Docker Compose
+
+```yaml
+version: '3.7'
+
+name: chlamyatlas
+
+services:
+  api:
+    image: csbdocker/chlamyatlas-api:latest
+    ports:
+      - 8000:80
+  ui:
+    image: csbdocker/chlamyatlas-ui:latest
+    environment:
+      PYTHON_SERVICE_URL: "http://host.docker.internal:8000"
+    ports:
+      - 5000:5000
+    # Use this to make host.docker.internal accessible on linux docker
+    #extra_hosts:
+    #  - "host.docker.internal:host-gateway"
 ```
 
 # Local Development

@@ -1,0 +1,18 @@
+version: '3.7'
+
+name: chlamyatlas
+
+services:
+  api:
+    image: csbdocker/chlamyatlas-api:latest
+    ports:
+      - 8000:80
+  ui:
+    image: csbdocker/chlamyatlas-ui:latest
+    environment:
+      PYTHON_SERVICE_URL: "http://host.docker.internal:8000"
+    ports:
+      - 5000:5000
+    # Use this to make host.docker.internal accessible on linux docker
+    extra_hosts:
+     - "host.docker.internal:host-gateway"

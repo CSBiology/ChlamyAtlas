@@ -3,6 +3,7 @@ namespace Components
 open Feliz
 open Feliz.DaisyUI
 open Feliz.Router
+open Shared
 
 type Footer =
 
@@ -21,15 +22,17 @@ type Footer =
                     Daisy.footerTitle "Versions"
                     Html.span [
                         Html.text "UI-Version: "
-                        match model.Version.UIVersion with
-                        | Some version -> Html.b version
-                        | None -> Html.span "connecting .."
+                        match model.Version with
+                        | {UIVersion = Success v} -> Html.b v
+                        | {UIVersion = Loading} -> Html.span "connecting .."
+                        | {UIVersion = NotAvailable _} -> Html.span "no connection"
                     ]
                     Html.span [
                         Html.text "ML-Version: "
-                        match model.Version.MLVersion with
-                        | Some version -> Html.b version
-                        | None -> Html.span "connecting .."
+                        match model.Version with
+                        | {MLVersion = Success v} -> Html.b v
+                        | {MLVersion = Loading} -> Html.span "connecting .."
+                        | {MLVersion = NotAvailable _} -> Html.span "no connection"
                     ]
                 ]
                 Html.nav [

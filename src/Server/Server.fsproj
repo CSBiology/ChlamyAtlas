@@ -7,9 +7,9 @@
     <UserSecretsId>adad89d0-732c-4735-8c06-0b0000a3b1d9</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <Content Update="Decoys\*.csv">
+    <EmbeddedResource Include="Decoys\*.csv">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FastaReader.fs" />

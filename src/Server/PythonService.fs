@@ -13,11 +13,11 @@ open System
 
 module Helper =
 
-    let python_service_api_v1 = Environment.python_service_url + "/api/v1"
+    let python_service_api_v1 = Environment.python_service_url() + "/api/v1"
     let v1PredictApiUrl = python_service_api_v1 + "/predict"
     let pythonServiceClient() =
         let httpClient = new HttpClient()
-        httpClient.BaseAddress <- System.Uri(Environment.python_service_url)
+        httpClient.BaseAddress <- System.Uri(Environment.python_service_url())
         httpClient.Timeout <- System.TimeSpan(0,5,0)
         httpClient
 
@@ -41,7 +41,7 @@ let inline logws (id: Guid) format =
 
 let getVersion() =
     task {
-        let! response = pythonServiceClient().GetAsync(Environment.python_service_url + "/predictor_version")
+        let! response = pythonServiceClient().GetAsync("/predictor_version")
         let! content = response.Content.ReadAsStringAsync()
         let version = JsonConvert.DeserializeObject<{|Version: string|} >(content)
         return version.Version
