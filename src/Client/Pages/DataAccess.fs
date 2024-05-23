@@ -270,8 +270,9 @@ type DataAccess =
         //87cc0fed-ea60-46fc-8040-5be8efaee695
     [<ReactComponent>]
     static member private DataView(data: DataResponseDTO) =
+        let chunkSize = 20
         let activeChunk, setActiveChunk = React.useState(0)
-        let chunkedData = data.Data |> Seq.chunkBySize 50
+        let chunkedData = data.Data |> Seq.chunkBySize chunkSize
         let chunkCount = Seq.length chunkedData
         let tpHeader (name: string) (txt: string) = 
             Html.th [
@@ -327,7 +328,7 @@ type DataAccess =
                                         Html.th ""
                                         Html.th "Header"
                                         tpHeader "Prediction"
-                                            """Represents the model's final prediction of the\n
+                                            """Represents the model's final prediction of the
 protein's localization based on the highest score
 and its corresponding q-value. The final localization
 is determined by comparing the q-values and
@@ -352,7 +353,9 @@ q-values exceed the cutoff, the protein is classified as "Cytoplasmic." """
                                     for i in 0 .. (chunk.Length-1) do
                                         let ele = chunk.[i]
                                         let innerIndex = i+1
-                                        let outerIndex = innerIndex * (activeChunk+1)
+                                        let itemsBefore = (activeChunk) * chunkSize
+                                        let outerIndex = innerIndex + itemsBefore
+                                        log(innerIndex, (activeChunk+1))
                                         Html.tr [
                                             Html.th (outerIndex)
                                             for field in [|
