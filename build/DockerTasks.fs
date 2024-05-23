@@ -51,9 +51,10 @@ let dockerTest = BuildTask.createFn "DockerTest" [] (fun config ->
 
 /// Must login into "csbdocker" docker account
 let dockerPublish = BuildTask.createFn "DockerPublish" [] (fun config ->
-    let check = Fake.Core.UserInput.getUserInput($"Do you want to publish to docker-hub? (y/yes/true)" )
     let uiVersion = Versions.getUIVersion()
     let mlVersion = Versions.getMLVersion()
+    Trace.trace $"Versions found: UI: {uiVersion}, ML: {mlVersion}"
+    let check = Fake.Core.UserInput.getUserInput($"Do you want to publish to docker-hub? (y/yes/true)" )
     match check.ToLower() with
     | "y" | "yes" | "true" ->
         let dockerTagImage() =

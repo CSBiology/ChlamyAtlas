@@ -2,6 +2,8 @@
 
 A web UI for optimised versions of the models published in Wang et al. 2023.
 
+![alt text](./assets/image2.png)
+
 # Supported formats
 
 ChlamyAtlas expects input in either the FASTA format or as pure amino acid sequence.
@@ -42,6 +44,39 @@ FAVCNEFIMNKKDHISNESYDLVNYKPNSSFPVINHHRSQGAANSIEQHQFTDLHYSFGA
 KPRDLMHNYQNMY
 ```
 
+# Result
+
+![alt text](./assets/image.png)
+
+Explanations of Chloropred ,Qchloro, Mitopred,Qmito,Secrpred,Qsecr, and FinalPred.
+
+### Chloropred
+
+Prediction score indicating the likelihood of the protein being localized to the Chloroplast. A higher scores suggest a stronger prediction that the protein is localized in the Chloroplast.
+
+### Qchloro
+
+q-value associated with the Chloroplast prediction score. Provides a measure of statistical significance for the Chloroplast prediction. Lower q-values indicate higher statistical significance.
+
+### Mitopred
+Prediction score for the localization of the protein to the Mitochondria. A higher scores suggest a stronger prediction of Mitochondrial localization.
+
+### Qmito
+q-value associated with the Mitochondria prediction score. Indicates the statistical significance of the Mitochondria localization prediction. Lower q-values suggest a more reliable prediction.
+
+### Secrpred
+Prediction score for identifying the protein as a Secretory Protein.A higher scores indicate a stronger likelihood that the protein functions as a Secretory Protein.
+
+### Qsecr
+q-value for the Secretory Protein prediction. Provides a measure of the statistical significance of the Secretory Protein prediction. Lower q-values are indicative of more statistically significant predictions.
+
+### FinalPred
+Represents the model's final prediction of the protein's localization based on the highest score and its corresponding q-value. The final localization is determined by comparing the q-values and prediction scores against preset cutoffs. If all q-values exceed the cutoff, the protein is classified as "Cytoplasmic."
+
+### Cutoff
+The threshold q-value below which a prediction is considered statistically significant. Set to 0.05 by default, meaning that predictions with q-values below this threshold are classified as significant. This parameter helps in distinguishing between statistically significant and non-significant predictions, reducing the chance of false-positive localizations.
+
+
 # Docker
 
 ## Environment Variables
@@ -70,9 +105,9 @@ KPRDLMHNYQNMY
 
     Default: `http://localhost:8000`
 
-    Remarks: In docker compose this could be `http://host.docker.internal:8000`
+    *Remarks:* In docker compose this could be `http://host.docker.internal:8000`
 
-    Remarks: On Linux might require:
+    *Remarks:* On Linux might require:
 
     ```
     extra_hosts:
@@ -95,15 +130,20 @@ services:
     image: csbdocker/chlamyatlas-api:latest
     ports:
       - 8000:80
+    environment:
+      GUNICORN_CMD_ARGS: "-k uvicorn.workers.UvicornWorker --preload"
+      MAX_WORKERS: "4"
+      TIMEOUT: "0"
   ui:
     image: csbdocker/chlamyatlas-ui:latest
     environment:
       PYTHON_SERVICE_URL: "http://host.docker.internal:8000"
+      PYTHON_SERVICE_STORAGE_TIMESPAN: "7"
     ports:
       - 5000:5000
     # Use this to make host.docker.internal accessible on linux docker
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
+    extra_hosts:
+     - "host.docker.internal:host-gateway"
 ```
 
 # Local Development
@@ -115,7 +155,7 @@ You'll need to install the following pre-requisites in order to build SAFE appli
 * [.NET SDK](https://www.microsoft.com/net/download) 8.0 or higher
 * [Node 18](https://nodejs.org/en/download/) or higher
 * [NPM 9](https://www.npmjs.com/package/npm) or higher
-* [Python 3.10](https://www.python.org/downloads/) or higher
+* [Python 3.11](https://www.python.org/downloads/) or higher
 
 ## Install
 
@@ -135,7 +175,7 @@ plus in another terminal run:
 
 1. activate local python environment: `.\.venv\Scripts\Activate.ps1`
 2. navigate to fastapi folder: `cd .\src\FastAPI\`
-3. start fastapi backend: `python -m uvicorn app.main:app --reload`
+3. start fastapi backend: `./run.cmd`
 
 ## Activate Email notification (optional)
 
@@ -152,6 +192,21 @@ Set user-secrets in the following schema:
   }
 }
 ```
+
+## Publish
+
+### Test Publish
+
+1. `.\build.cmd dockerbundle [--uionly]`, creates `:new` docker image(s). Skip fastapi image with `--uionly`
+2. `.\build.cmd dockertest`, uses local docker-compose file to start `:new` images.
+
+### To docker-hub
+
+1. Login to CSB-Docker
+2. Ensure correct Versions, both for python and dotnet service.
+    - `.\build.cmd versions`
+    - *Remarks:* Versions are defined in project files. Paths can be found in build project `ProjectInfo.fs`. Accessed via regex parsing.
+3. `.\build.cmd dockerpublish`
 
 # Request Workflow
 
@@ -192,33 +247,3 @@ sequenceDiagram
     net-->>c: return data
     c-->>u: download data
 ```
-
-# Result
-
-Explanations of Chloropred ,Qchloro, Mitopred,Qmito,Secrpred,Qsecr, and FinalPred.
-
-### Chloropred
-
-Prediction score indicating the likelihood of the protein being localized to the Chloroplast. A higher scores suggest a stronger prediction that the protein is localized in the Chloroplast.
-
-### Qchloro
-
-q-value associated with the Chloroplast prediction score. Provides a measure of statistical significance for the Chloroplast prediction. Lower q-values indicate higher statistical significance.
-
-### Mitopred
-Prediction score for the localization of the protein to the Mitochondria. A higher scores suggest a stronger prediction of Mitochondrial localization.
-
-### Qmito
-q-value associated with the Mitochondria prediction score. Indicates the statistical significance of the Mitochondria localization prediction. Lower q-values suggest a more reliable prediction.
-
-### Secrpred
-Prediction score for identifying the protein as a Secretory Protein.A higher scores indicate a stronger likelihood that the protein functions as a Secretory Protein.
-
-### Qsecr
-q-value for the Secretory Protein prediction. Provides a measure of the statistical significance of the Secretory Protein prediction. Lower q-values are indicative of more statistically significant predictions.
-
-### FinalPred
-Represents the model's final prediction of the protein's localization based on the highest score and its corresponding q-value. The final localization is determined by comparing the q-values and prediction scores against preset cutoffs. If all q-values exceed the cutoff, the protein is classified as "Cytoplasmic."
-
-### Cutoff
-The threshold q-value below which a prediction is considered statistically significant. Set to 0.05 by default, meaning that predictions with q-values below this threshold are classified as significant. This parameter helps in distinguishing between statistically significant and non-significant predictions, reducing the chance of false-positive localizations.

@@ -1,16 +1,22 @@
 version: '3.7'
 
-name: chlamyatlas
+name: chlamyatlasp
 
 services:
   api:
     image: csbdocker/chlamyatlas-api:latest
     ports:
       - 8000:80
+    # http://www.streppone.it/cosimo/blog/2021/08/deploying-large-deep-learning-models-in-production/
+    environment:
+      GUNICORN_CMD_ARGS: "-k uvicorn.workers.UvicornWorker --preload"
+      MAX_WORKERS: "4"
+      TIMEOUT: "0"
   ui:
     image: csbdocker/chlamyatlas-ui:latest
     environment:
       PYTHON_SERVICE_URL: "http://host.docker.internal:8000"
+      PYTHON_SERVICE_STORAGE_TIMESPAN: "7"
     ports:
       - 5000:5000
     # Use this to make host.docker.internal accessible on linux docker
