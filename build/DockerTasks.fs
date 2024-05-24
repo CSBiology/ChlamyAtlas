@@ -53,17 +53,17 @@ let dockerTest = BuildTask.createFn "DockerTest" [] (fun config ->
 let dockerPublish = BuildTask.createFn "DockerPublish" [] (fun config ->
     let uiVersion = Versions.getUIVersion()
     let mlVersion = Versions.getMLVersion()
-    Trace.trace $"Versions found: UI: {uiVersion}, ML: {mlVersion}"
+    Trace.traceImportant $"Versions found: UI: {uiVersion}, ML: {mlVersion}"
     let check = Fake.Core.UserInput.getUserInput($"Do you want to publish to docker-hub? (y/yes/true)" )
     match check.ToLower() with
     | "y" | "yes" | "true" ->
         let dockerTagImage() =
             // tag api
-            run docker ["tag"; $"{ImageName_api}:latest"; $"{ImageName_api_remote}:{mlVersion}"] ""
-            run docker ["tag"; $"{ImageName_api}:latest"; $"{ImageName_api_remote}:latest"] ""
+            run docker ["tag"; $"{ImageName_api}:new"; $"{ImageName_api_remote}:{mlVersion}"] ""
+            run docker ["tag"; $"{ImageName_api}:new"; $"{ImageName_api_remote}:latest"] ""
             // tag ui
-            run docker ["tag"; $"{ImageName_ui}:latest"; $"{ImageName_ui_remote}:{uiVersion}"] ""
-            run docker ["tag"; $"{ImageName_ui}:latest"; $"{ImageName_ui_remote}:latest"] ""
+            run docker ["tag"; $"{ImageName_ui}:new"; $"{ImageName_ui_remote}:{uiVersion}"] ""
+            run docker ["tag"; $"{ImageName_ui}:new"; $"{ImageName_ui_remote}:latest"] ""
         let dockerPushImage() =
             // push api
             run docker ["push"; $"{ImageName_api_remote}:{mlVersion}"] ""
@@ -71,10 +71,11 @@ let dockerPublish = BuildTask.createFn "DockerPublish" [] (fun config ->
             // push ui
             run docker ["push"; $"{ImageName_ui_remote}:{uiVersion}"] ""
             run docker ["push"; $"{ImageName_ui_remote}:latest"] ""
-        Trace.trace $"Tagging image with :latest and ui:{uiVersion}/api:{mlVersion}"
+        Trace.traceImportant $"Tagging image with :latest and ui:{uiVersion}/api:{mlVersion}"
         dockerTagImage()
-        Trace.trace $"Pushing image to dockerhub with :latest and ui:{uiVersion}/api:{mlVersion}"
+        Trace.traceImportant $"Pushing image to dockerhub with :latest and ui:{uiVersion}/api:{mlVersion}"
         dockerPushImage()
+        Trace.trace "Done!"
     | _ ->
         Trace.trace "Exit DockerPublish task."
 )

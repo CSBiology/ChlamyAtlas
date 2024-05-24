@@ -101,6 +101,10 @@ The threshold q-value below which a prediction is considered statistically signi
 
     Default: Set via user secrets
 
+- **PYTHON_SERVICE_TIMEOUT**: Time in minutes before conenction timeout between ui and api service
+
+    Default: 30 minutes
+
 - **PYTHON_SERVICE_URL**: Sets the url for the api predictor backend.
 
     Default: `http://localhost:8000`
@@ -206,7 +210,8 @@ Set user-secrets in the following schema:
 2. Ensure correct Versions, both for python and dotnet service.
     - `.\build.cmd versions`
     - *Remarks:* Versions are defined in project files. Paths can be found in build project `ProjectInfo.fs`. Accessed via regex parsing.
-3. `.\build.cmd dockerpublish`
+3. Run `Test Publish` steps. The following step requires built `:new` images.
+4. `.\build.cmd dockerpublish`
 
 # Request Workflow
 

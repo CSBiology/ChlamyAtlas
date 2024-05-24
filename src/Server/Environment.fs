@@ -55,6 +55,14 @@ let private websocket_endpoint_key = "PYTHON_SERVICE_WS"
 [<Literal>]
 let private storage_timespan_key = "PYTHON_SERVICE_STORAGE_TIMESPAN"
 
+[<Literal>]
+let private timeout_key = "PYTHON_SERVICE_TIMEOUT"
+
+let python_service_timeout() =
+    let def = TimeSpan.FromMinutes(30)
+    let nullable = System.Environment.GetEnvironmentVariable(timeout_key)
+    if isNull nullable then def else int nullable |> TimeSpan.FromMinutes
+
 let python_service_url() =
     let def = "http://localhost:8000"
     let nullable = System.Environment.GetEnvironmentVariable(url_key)

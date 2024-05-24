@@ -18,7 +18,7 @@ module Helper =
     let pythonServiceClient() =
         let httpClient = new HttpClient()
         httpClient.BaseAddress <- System.Uri(Environment.python_service_url())
-        httpClient.Timeout <- System.TimeSpan(0,5,0)
+        httpClient.Timeout <- Environment.python_service_timeout()
         httpClient
 
 open Helper
