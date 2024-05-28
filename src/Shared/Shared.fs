@@ -5,7 +5,7 @@ open System
 module Urls =
 
     [<LiteralAttribute>]
-    let WebsiteUrl = "TODO"
+    let WebsiteUrl = "https://csb-chlamyatlas.bio.rptu.de"
 
     [<Literal>]
     let ContactEmailObfuscated = // obfuscated by https://www.email-obfuscator.com
