@@ -26,6 +26,9 @@ module Urls =
     [<Literal>]
     let CSBiology = "https://csbiology.github.io"
 
+    [<Literal>]
+    let RPTU = "https://rptu.de"
+
     module ProteomIQon =
         
         [<Literal>]

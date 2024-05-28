@@ -11,7 +11,17 @@ type HeadBanner =
         Html.nav [
             prop.className "bg-white px-6 py-3"
             prop.children [
-                Html.img [prop.src rptu_logo; prop.style [style.width 192; style.height 74]]
+                Html.a [
+                    prop.href Shared.Urls.RPTU
+                    prop.target.blank
+                    prop.children [
+                        Html.img [
+                            prop.className "cursor-pointer";
+                            prop.src rptu_logo;
+                            prop.style [style.width 192; style.height 74]
+                        ]
+                    ]
+                ]
                 Daisy.button.a [
                     button.link 
                     prop.className "p-0 no-underline hover:underline"
