@@ -12,22 +12,43 @@ let regexPattern = @"\|(?<uid>[\S]+?)\|"
 let regex = Regex(regexPattern)
 
 // if you run this locally change this value to allow parsing more values at once
-let maxCount = 9999999
+let private maxCount = 9999999
 
+let private maxSequenceLength = 11000
+
+/// Cuts out middle aa seq part. Target sequences are mostly found at start or end of sequence. So this is the best way to improve performance for super large sequences.
+let trimMiddle0(sequence: string, maxCount) =
+    let length = sequence.Length
+    if length > maxSequenceLength then
+        let half = length / 2
+        let diff = length - maxSequenceLength
+        let halfDiff = diff / 2
+        let first = sequence.Substring(0, half-halfDiff)
+        let last = sequence.Substring(length - half + halfDiff)
+        first + last
+    else
+        sequence
+
+let trimMiddle(sequence: string) =
+    trimMiddle0(sequence, maxSequenceLength)
+    
 let private read (reader:TextReader) =
     let mutable noNameIterator = 0
     let mutable iterator = 0
     let rec readRecords (acc: DataInputItem list) (currentHeader: string) (currentSeq: string) =
         let nextLine = reader.ReadLine()
         match nextLine with
-        | null | _ when (iterator >= maxCount) || (isNull nextLine) -> List.rev ({ Header = currentHeader; Sequence = currentSeq } :: acc)
+        | null | _ when (iterator >= maxCount) || (isNull nextLine) ->
+            let trimmedSeq = trimMiddle currentSeq
+            List.rev ({ Header = currentHeader; Sequence = trimmedSeq } :: acc)
         | line when line.StartsWith(">!") ->
             iterator <- iterator + 1
             noNameIterator <- noNameIterator + 1
             let newHeader = sprintf "Unknown%i" noNameIterator
             let line' = line.Substring(2).Trim()
             if currentHeader <> "" && currentSeq <> "" then
-                readRecords ({ Header = currentHeader; Sequence = currentSeq } :: acc) newHeader line'
+                let trimmedSeq = trimMiddle currentSeq
+                readRecords ({ Header = currentHeader; Sequence = trimmedSeq } :: acc) newHeader line'
             else
                 readRecords acc newHeader line'
         | line when line.StartsWith(">") ->
@@ -39,7 +60,8 @@ let private read (reader:TextReader) =
                 | false -> raw
             iterator <- iterator + 1
             if currentHeader <> "" && currentSeq <> "" then
-                readRecords ({ Header = currentHeader; Sequence = currentSeq } :: acc) newHeader ""
+                let trimmedSeq = trimMiddle currentSeq
+                readRecords ({ Header = currentHeader; Sequence = trimmedSeq } :: acc) newHeader ""
             else
                 readRecords acc newHeader ""
         | line ->
