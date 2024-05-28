@@ -6,11 +6,12 @@ open Feliz
 type EmailLaunchAnchor =
     static member Main (name: string, email: string) =
         Html.a [
+            prop.className "cursor-pointer"
             prop.onClick (fun e ->
                 e.preventDefault()
                 Browser.Dom.window.location.href <- email;
             )
-            prop.href ""
+            //prop.href ""
             prop.text name
         ]
 
