@@ -83,11 +83,11 @@ type About =
                     ]
                     Html.h2 "Handling Long Protein Sequences"
                     Html.p [
-                        Html.text "Chlamy Atlas is built on a protein language model composed of transformer blocks. The computation of sequences by these blocks scales quadratically with the sequence's length, making it impractical to process sequences of arbitrary length in the usual manner. Therefore, for longer sequences, we opted to slice out the middle portion, as targeting signals are typically located at the N or C terminus"
+                        Html.text "Chlamy Atlas is built on a protein language model composed of transformer blocks. The computation of sequences by these blocks scales quadratically with the sequence's length, making it impractical to process sequences of arbitrary length in the usual manner. Therefore, for longer sequences, we opted to slice out the middle portion, as targeting signals are typically located at the N or C terminus."
                         About.PaperReF(ref, "Detecting sequence signals in targeting peptides using deep learning", REF.REFSequenceSignalsDeepLearning, 4)
                         Html.sup ","
                         About.PaperReF(ref, "DeepLoc 2.0: multi-label subcellular localization prediction using protein language models", REF.REFDeepLoc, 5)
-                        Html.textf "This approach minimizes the impact on the final prediction while ensuring quick computation. However, since this process can still affect prediction accuracy, we apply it only to protein sequences exceeding a maximum length of %i amino acids." Shared.Constants.MaxSequenceLength
+                        Html.textf " This approach minimizes the impact on the final prediction while ensuring quick computation. However, since this process can still affect prediction accuracy, we apply it only to protein sequences exceeding a maximum length of %i amino acids." Shared.Constants.MaxSequenceLength
                     ]
                     Html.h2 "References"
                     Html.ol [
