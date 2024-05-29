@@ -224,8 +224,11 @@ sequenceDiagram
     u -->> c: Gives data
     c -->>+net: sends user data
     par start analysis
-    net-)+py: sends data, trigger eval
-    py-)net: returns binned data
+    loop
+    net-)+py: send sequence
+    py->py: predict target
+    py-)net: return predicted target
+    end
     and return request information
     net -) c: returns `request-ID`
     end
