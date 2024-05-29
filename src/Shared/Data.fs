@@ -2,6 +2,10 @@ namespace Shared
 
 open System
 
+module Constants =
+
+    let MaxSequenceLength = 11000
+
 type DataInputItem = {
     Header: string
     Sequence: string

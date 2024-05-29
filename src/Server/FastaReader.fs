@@ -14,14 +14,14 @@ let regex = Regex(regexPattern)
 // if you run this locally change this value to allow parsing more values at once
 let private maxCount = 9999999
 
-let private maxSequenceLength = 11000
+
 
 /// Cuts out middle aa seq part. Target sequences are mostly found at start or end of sequence. So this is the best way to improve performance for super large sequences.
 let trimMiddle0(sequence: string, maxCount) =
     let length = sequence.Length
-    if length > maxSequenceLength then
+    if length > Constants.MaxSequenceLength then
         let half = length / 2
-        let diff = length - maxSequenceLength
+        let diff = length - Constants.MaxSequenceLength
         let halfDiff = diff / 2
         let first = sequence.Substring(0, half-halfDiff)
         let last = sequence.Substring(length - half + halfDiff)
@@ -30,7 +30,7 @@ let trimMiddle0(sequence: string, maxCount) =
         sequence
 
 let trimMiddle(sequence: string) =
-    trimMiddle0(sequence, maxSequenceLength)
+    trimMiddle0(sequence, Constants.MaxSequenceLength)
     
 let private read (reader:TextReader) =
     let mutable noNameIterator = 0

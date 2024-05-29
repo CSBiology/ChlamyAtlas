@@ -17,8 +17,25 @@ module Urls =
     [<Literal>]
     let SupportedFastaFormat = @"https://github.com/CSBiology/ChlamyAtlas?tab=readme-ov-file#supported-formats"
 
-    [<Literal>]
-    let REFPaperAtlas = @"https://www.sciencedirect.com/science/article/pii/S0092867423006761?via%3Dihub"
+    module REF =
+
+        [<Literal>]
+        let REFPaperAtlas = @"https://www.sciencedirect.com/science/article/pii/S0092867423006761?via%3Dihub"
+
+
+        [<Literal>]
+        let REFSequenceSignalsDeepLearning = @"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6769257/"
+
+        [<Literal>]
+        let REFDeepLoc = @"https://academic.oup.com/nar/article/50/W1/W228/6576357"
+
+        module ProteomIQon =
+        
+            [<Literal>]
+            let Zenodo = @"https://zenodo.org/records/6482417"
+
+            [<Literal>]
+            let GitHub = @"https://github.com/CSBiology/ProteomIQon"
 
     [<Literal>]
     let BioRPTU = @"https://bio.rptu.de"
@@ -28,14 +45,6 @@ module Urls =
 
     [<Literal>]
     let RPTU = "https://rptu.de"
-
-    module ProteomIQon =
-        
-        [<Literal>]
-        let Zenodo = @"https://zenodo.org/records/6482417"
-
-        [<Literal>]
-        let GitHub = @"https://github.com/CSBiology/ProteomIQon"
 
 module EndPoints =
     [<Literal>]

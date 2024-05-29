@@ -29,8 +29,8 @@ let uiOnly (config: TargetParameter)=
 let dockerBundle = BuildTask.createFn "DockerBundle" [] (fun config ->
     let uiOnly = uiOnly config
     //let release = release
-    Trace.traceImportant $"Start building {ImageName_api} image."
     if not uiOnly then
+        Trace.traceImportant $"Start building {ImageName_api} image."
         run
             docker
             [
